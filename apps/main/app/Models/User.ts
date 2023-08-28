@@ -2,7 +2,7 @@ import { DateTime } from 'luxon';
 import Hash from '@ioc:Adonis/Core/Hash';
 import { column, beforeSave, BaseModel } from '@ioc:Adonis/Lucid/Orm';
 
-export default class Auth extends BaseModel {
+export default class User extends BaseModel {
     @column({ isPrimary: true })
     public id: number;
 
@@ -19,13 +19,13 @@ export default class Auth extends BaseModel {
      * `5:no`, `6:yes`
      */
     @column()
-    public emailVerifiedInd: number;
+    public emailVerifiedInd: 5 | 6;
 
     /**
      * `0:inactive`, `1:active`
      */
     @column()
-    public status: number;
+    public status: 0 | 1;
 
     @column.dateTime({ autoCreate: true })
     public createdAt: DateTime;
@@ -34,9 +34,9 @@ export default class Auth extends BaseModel {
     public updatedAt: DateTime;
 
     @beforeSave()
-    public static async hashPassword(auth: Auth) {
-        if (auth.$dirty.password) {
-            auth.password = await Hash.make(auth.password);
+    public static async hashPassword(user: User) {
+        if (user.$dirty.password) {
+            user.password = await Hash.make(user.password);
         }
     }
 }

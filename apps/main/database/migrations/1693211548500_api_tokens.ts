@@ -10,7 +10,7 @@ export default class extends BaseSchema {
                 .integer('user_id')
                 .unsigned()
                 .references('id')
-                .inTable('auths')
+                .inTable('users')
                 .onDelete('CASCADE');
             table.string('name').notNullable();
             table.string('type').notNullable();
