@@ -15,6 +15,18 @@ export default class Auth extends BaseModel {
     @column()
     public rememberMeToken: string | null;
 
+    /**
+     * `5:no`, `6:yes`
+     */
+    @column()
+    public emailVerifiedInd: number;
+
+    /**
+     * `0:inactive`, `1:active`
+     */
+    @column()
+    public status: number;
+
     @column.dateTime({ autoCreate: true })
     public createdAt: DateTime;
 
