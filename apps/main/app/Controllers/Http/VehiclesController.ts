@@ -8,8 +8,8 @@ export default class VehiclesController {
 
         const vehicles = await Vehicle.query()
             .select('*')
-            .where('userId', user.id)
-            .orderBy('createdAt');
+            .where('user_id', user.id)
+            .orderBy('created_at');
 
         response.json(vehicles);
     }
