@@ -11,9 +11,6 @@ jobs:
     test:
         runs-on: ubuntu-latest
 
-        env:
-            APP_KEY: ${{ secrets.TEST_APP_KEY }}
-
         strategy:
             matrix:
                 node-version: [18.x]
