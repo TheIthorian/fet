@@ -23,3 +23,14 @@ import Route from '@ioc:Adonis/Core/Route';
 Route.get('/', async () => {
     return { hello: 'world' };
 });
+
+Route.post('register', 'AuthController.register');
+Route.post('login', 'AuthController.login');
+Route.post('logout', 'AuthController.logout').middleware('auth');
+Route.get('api/me', 'AuthController.me').middleware('auth');
+
+Route.group(() => {
+    Route.resource('vehicles', 'VehiclesController').apiOnly();
+})
+    .prefix('api')
+    .middleware('auth');
