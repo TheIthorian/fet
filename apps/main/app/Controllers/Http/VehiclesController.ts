@@ -28,7 +28,7 @@ export default class VehiclesController {
         });
 
         const data = await request.validate({ schema: vehicleSchema });
-        const regNo = data.reg_no;
+        const regNo = data.reg_no.toUpperCase().replace(/[^a-zA-Z0-9]/g, '');
 
         const [existingVehicles] = await Database.from('vehicles')
             .count('*', 'total')
@@ -36,7 +36,7 @@ export default class VehiclesController {
             .andWhere('reg_no', regNo);
 
         if (existingVehicles.total > 0) {
-            throw VehicleAlreadyExistException.new({ existingRegNo: regNo });
+            throw VehicleAlreadyExistException.new(regNo);
         }
 
         const vehicle = await Vehicle.create({
