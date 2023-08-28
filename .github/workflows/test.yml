@@ -11,6 +11,9 @@ jobs:
     test:
         runs-on: ubuntu-latest
 
+        env:
+            APP_KEY: ${{ secrets.TEST_APP_KEY }}
+
         strategy:
             matrix:
                 node-version: [18.x]
@@ -22,5 +25,6 @@ jobs:
               with:
                   node-version: ${{ matrix.node-version }}
                   cache: 'npm'
+            - run: echo
             - run: npm ci
             - run: npm test

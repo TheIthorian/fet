@@ -8,10 +8,10 @@ on:
 
 jobs:
     deploy:
+        runs-on: ubuntu-latest
+
         env:
             APP_KEY: ${{ secrets.TEST_APP_KEY }}
-
-        runs-on: ubuntu-latest
 
         strategy:
             matrix:
