@@ -9,6 +9,8 @@ export default class extends BaseSchema {
             table.string('email', 255).notNullable().unique();
             table.string('password', 180).notNullable();
             table.string('remember_me_token').nullable();
+            table.integer('email_verified_ind').notNullable().checkIn(['5', '6']); // TODO - Should this be string?
+            table.integer('status').notNullable().checkIn(['0', '1']);
 
             /**
              * Uses timestampz for PostgreSQL and DATETIME2 for MSSQL
