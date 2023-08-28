@@ -1,6 +1,7 @@
 import { DateTime } from 'luxon';
 import Hash from '@ioc:Adonis/Core/Hash';
-import { column, beforeSave, BaseModel } from '@ioc:Adonis/Lucid/Orm';
+import { column, beforeSave, BaseModel, afterCreate } from '@ioc:Adonis/Lucid/Orm';
+import UserConfig from './UserConfig';
 
 export default class User extends BaseModel {
     @column({ isPrimary: true })
@@ -38,5 +39,19 @@ export default class User extends BaseModel {
         if (user.$dirty.password) {
             user.password = await Hash.make(user.password);
         }
+    }
+
+    /**
+     * Initialise user config
+     */
+    @afterCreate()
+    public static async createConfig(user: User) {
+        // TODO - Should this be here?
+        await UserConfig.create({
+            userId: user.id,
+            displayName: user.email,
+            setupRequiredInd: 6,
+            geolocationEnabledInd: 5,
+        });
     }
 }
