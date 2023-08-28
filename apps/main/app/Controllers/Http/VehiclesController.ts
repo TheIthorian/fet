@@ -1,6 +1,8 @@
 import { schema } from '@ioc:Adonis/Core/Validator';
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
 import Vehicle from 'App/Models/Vehicle';
+import Database from '@ioc:Adonis/Lucid/Database';
+import VehicleAlreadyExistException from 'App/Exceptions/VehicleAlreadyExistException';
 
 export default class VehiclesController {
     public async index({ response, auth }: HttpContextContract) {
@@ -26,10 +28,20 @@ export default class VehiclesController {
         });
 
         const data = await request.validate({ schema: vehicleSchema });
+        const regNo = data.reg_no;
+
+        const [existingVehicles] = await Database.from('vehicles')
+            .count('*', 'total')
+            .where('user_id', user.id)
+            .andWhere('reg_no', regNo);
+
+        if (existingVehicles.total > 0) {
+            throw VehicleAlreadyExistException.new({ existingRegNo: regNo });
+        }
 
         const vehicle = await Vehicle.create({
             vin: data.vin,
-            regNo: data.reg_no,
+            regNo: regNo,
             make: data.make,
             model: data.model,
             fuelType: data.fuel_type,
