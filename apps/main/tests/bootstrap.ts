@@ -5,9 +5,11 @@
  * file.
  */
 
+import fs from 'fs';
 import type { Config } from '@japa/runner';
 import TestUtils from '@ioc:Adonis/Core/TestUtils';
 import { assert, runFailedTests, specReporter, apiClient } from '@japa/preset-adonis';
+import Application from '@ioc:Adonis/Core/Application';
 
 /*
 |--------------------------------------------------------------------------
@@ -47,7 +49,17 @@ export const reporters: Required<Config>['reporters'] = [specReporter()];
 |
 */
 export const runnerHooks: Pick<Required<Config>, 'setup' | 'teardown'> = {
-    setup: [() => TestUtils.ace().loadCommands()],
+    setup: [
+        () => TestUtils.ace().loadCommands(),
+        async () => {
+            const tmpPath = Application.makePath('tmp');
+            if (!fs.existsSync(tmpPath)) {
+                fs.mkdirSync(tmpPath);
+            }
+
+            await TestUtils.db().migrate();
+        },
+    ],
     teardown: [],
 };
 

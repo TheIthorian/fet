@@ -1,6 +1,6 @@
-# This workflow will do a clean installation of node dependencies, cache/restore them, and run tests
+# This workflow will do a clean installation of node dependencies, cache/restore them, and lint the source code
 
-name: test
+name: lint
 
 on:
     pull_request:
@@ -8,7 +8,7 @@ on:
     push:
 
 jobs:
-    test:
+    lint:
         runs-on: ubuntu-latest
 
         strategy:
@@ -22,6 +22,5 @@ jobs:
               with:
                   node-version: ${{ matrix.node-version }}
                   cache: 'npm'
-            - run: echo
             - run: npm ci
-            - run: npm test
+            - run: npm run lint

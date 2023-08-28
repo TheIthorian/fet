@@ -1,15 +1,17 @@
-# This workflow will do a clean installation of node dependencies, cache/restore them, and run tests
+# This workflow will do a clean installation of node dependencies, cache/restore them, build the project, and deploy to test
 
-name: test
+name: deploy_to_test
 
 on:
-    pull_request:
-        types: [reopened]
     push:
+        branches: ['dev']
 
 jobs:
-    test:
+    deploy:
         runs-on: ubuntu-latest
+
+        env:
+            APP_KEY: ${{ secrets.TEST_APP_KEY }}
 
         strategy:
             matrix:
@@ -22,6 +24,6 @@ jobs:
               with:
                   node-version: ${{ matrix.node-version }}
                   cache: 'npm'
-            - run: echo
             - run: npm ci
+            - run: npm run build --if-present
             - run: npm test
