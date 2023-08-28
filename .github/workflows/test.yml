@@ -3,8 +3,9 @@
 name: test
 
 on:
+    pull_request:
+        types: [reopened]
     push:
-        branches: ['dev']
 
 jobs:
     build:
