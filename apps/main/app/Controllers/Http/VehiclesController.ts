@@ -19,20 +19,20 @@ export default class VehiclesController {
 
         const vehicleSchema = schema.create({
             vin: schema.string.optional({ trim: true }),
-            regNo: schema.string({ trim: true }),
+            reg_no: schema.string({ trim: true }),
             make: schema.string({ trim: true }),
             model: schema.string({ trim: true }),
-            fuelType: schema.string({ trim: true }),
+            fuel_type: schema.string({ trim: true }),
         });
 
         const data = await request.validate({ schema: vehicleSchema });
 
         const vehicle = await Vehicle.create({
             vin: data.vin,
-            regNo: data.regNo,
+            regNo: data.reg_no,
             make: data.make,
             model: data.model,
-            fuelType: data.fuelType,
+            fuelType: data.fuel_type,
             userId: user.id,
         });
 
