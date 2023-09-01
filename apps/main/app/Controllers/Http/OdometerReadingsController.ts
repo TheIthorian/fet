@@ -18,14 +18,15 @@ export default class OdometerReadingsController {
     public async store({ request, response, auth }: HttpContextContract) {
         const user = await auth.use('api').authenticate();
 
-        const odometerSchema = schema.create({
-            value: schema.number(),
-        });
+        const { vehicleId } = request.params();
+
+        const odometerSchema = schema.create({ value: schema.number() });
 
         const data = await request.validate({ schema: odometerSchema });
 
         const odometerReading = await OdometerReading.create({
             userId: user.id,
+            vehicleId: vehicleId,
             value: data.value,
             readingDate: DateTime.now().toUTC(),
         });
