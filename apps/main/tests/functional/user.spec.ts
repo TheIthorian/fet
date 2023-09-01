@@ -1,6 +1,7 @@
 import { test } from '@japa/runner';
 import Database from '@ioc:Adonis/Lucid/Database';
 import User from 'App/Models/User';
+import UserFactory from 'Database/factories/UserFactory';
 
 test.group('POST /register', (group) => {
     let email: string;
@@ -17,10 +18,7 @@ test.group('POST /register', (group) => {
     });
 
     test('creates a new user', async ({ client }) => {
-        const response = await client.post('/register').json({
-            email,
-            password,
-        });
+        const response = await client.post('/register').json({ email, password });
 
         response.assertStatus(200);
         response.assertBodyContains({
@@ -40,10 +38,7 @@ test.group('POST /register', (group) => {
     test('does not create a new user when inputs are invalid', async ({ client }) => {
         password = 'sml'; // too small
 
-        const response = await client.post('/register').json({
-            email,
-            password,
-        });
+        const response = await client.post('/register').json({ email, password });
 
         response.assertStatus(422);
         response.assertBody({
@@ -59,17 +54,9 @@ test.group('POST /register', (group) => {
     });
 
     test('does not create a new user if the email is already used', async ({ client }) => {
-        await User.create({
-            email,
-            password,
-            emailVerifiedInd: 5,
-            status: 1,
-        });
+        await User.create(await UserFactory.merge({ email }).create());
 
-        const response = await client.post('/register').json({
-            email,
-            password,
-        });
+        const response = await client.post('/register').json({ email, password });
 
         response.assertStatus(422);
         response.assertBody({
@@ -97,19 +84,11 @@ test.group('POST /login', (group) => {
         email = 'test@user.spec.ts.login';
         password = 'password';
 
-        await User.create({
-            email,
-            password,
-            emailVerifiedInd: 6,
-            status: 1,
-        });
+        await User.create(await UserFactory.merge({ email, password }).create());
     });
 
     test('creates token when credentials are correct', async ({ client }) => {
-        const response = await client.post('/login').json({
-            email,
-            password,
-        });
+        const response = await client.post('/login').json({ email, password });
 
         response.assertStatus(200);
         response.assertBodyContains({
@@ -123,10 +102,9 @@ test.group('POST /login', (group) => {
     });
 
     test('does not create a token when credentials are incorrect', async ({ client }) => {
-        const response = await client.post('/login').json({
-            email,
-            password: 'incorrect password',
-        });
+        const response = await client
+            .post('/login')
+            .json({ email, password: 'an incorrect password' });
 
         response.assertStatus(400);
         response.assertBodyContains({
