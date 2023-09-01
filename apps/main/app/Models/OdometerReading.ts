@@ -9,6 +9,9 @@ export default class OdometerReading extends BaseModel {
     public userId: number;
 
     @column()
+    public vehicleId: number;
+
+    @column()
     public value: number;
 
     @column.dateTime()
