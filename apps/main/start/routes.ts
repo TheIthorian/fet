@@ -30,7 +30,10 @@ Route.post('logout', 'AuthController.logout').middleware('auth');
 Route.get('api/me', 'AuthController.me').middleware('auth');
 
 Route.group(() => {
+    Route.resource('me/config', 'UserConfigsController').apiOnly();
+
     Route.resource('vehicles', 'VehiclesController').apiOnly();
+    Route.resource('vehicles/:vehicleId/odometer', 'OdometerReadingsController').apiOnly();
 })
     .prefix('api')
     .middleware('auth');
