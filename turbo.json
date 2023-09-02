@@ -3,6 +3,13 @@
     "globalDependencies": [
         "**/.env.*local"
     ],
+    "globalEnv": [
+        "JOURNEY_SERVICE_DATABASE_URL",
+        "JOURNEY_SERVICE_HOST",
+        "JOURNEY_SERVICE_PORT",
+        "JOURNEY_SERVICE_NODE_ENV",
+        "JOURNEY_SERVICE_API_KEY"
+    ],
     "pipeline": {
         "build": {
             "dependsOn": [
