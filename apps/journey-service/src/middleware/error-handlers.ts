@@ -5,7 +5,7 @@ import { makeLogger } from '../logger';
 const log = makeLogger(module);
 
 export function errorHandler() {
-    return (error: Error | AppError, _: Request, res: Response, next: NextFunction) => {
+    return (error: Error | AppError, _: Request, res: Response, next: NextFunction): void => {
         log.error(error);
 
         if (error instanceof AppError) {

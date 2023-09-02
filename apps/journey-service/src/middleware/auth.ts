@@ -6,10 +6,11 @@ const log = makeLogger(module);
 
 export function authenticateApiKey(req: Request, _: Response, next: NextFunction): void {
     const requestKey = req.headers.api ?? '';
+
     if (requestKey === 'internal_api') {
         return next();
     }
 
-    log.error(`Invalid api key: ${requestKey}`);
+    log.error(`Invalid api key: ${Array.isArray(requestKey) ? requestKey[0] : requestKey}`);
     throw new ApiKeyAuthenticationError();
 }
