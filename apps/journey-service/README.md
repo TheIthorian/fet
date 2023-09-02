@@ -16,6 +16,8 @@ npm run build
 npm start
 ```
 
+Uses default port of `3010`
+
 ## Api Endpoints
 
 | Route                         | Description                               |
