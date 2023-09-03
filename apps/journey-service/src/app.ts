@@ -1,66 +1,36 @@
-// node
-import type { Server } from 'node:http';
 import { createServer as createHttpServer } from 'node:http';
-// lib
 import express from 'express';
-import bodyParser from 'body-parser';
-import expressStatusMonitor from 'express-status-monitor';
-//app
-import { makeLogger, requestLogger } from 'fet-logger';
-import { initialiseRoutes } from './routes';
+import { makeLogger } from 'fet-logger';
 import config from './config';
-import { errorHandler } from './middleware/error-handlers';
+import { startup } from './express';
 
 const log = makeLogger(module);
 
 log.info({ config });
 
-export function expressApp(port: number): express.Express {
-    const app = express();
+export const app = express();
+export const server = createHttpServer(app);
 
-    app.use(requestLogger());
+startup(app);
 
-    app.use(expressStatusMonitor()); // `GET /status` to see stats
+setImmediate(() => {
+    const port = config.port;
+    const host = config.host;
+    server.listen(port, host, () => {
+        log.info(
+            `App listening on http://${config.host}:${port} in ${app.get('env') as string} mode`
+        );
 
-    app.use(bodyParser.urlencoded({ extended: true }));
-
-    app.use(bodyParser.json());
-
-    app.use(initialiseRoutes());
-
-    app.use(errorHandler());
-
-    app.get('/', (_, res) => res.send('Hello'));
-
-    app.set('port', port);
-
-    return app;
-}
-
-export function start(port: number): { app: express.Express; server: Server } {
-    const app = expressApp(port);
-    const server = createHttpServer(app);
-    server.listen(port);
-
-    log.info(`App listening on http://${config.host}:${port}`);
-    return { app, server };
-}
-
-export async function stop(server: Server): Promise<void> {
-    process.stdout.write('Stopping server\n');
-    const promise = new Promise<void>((resolve, reject) => {
-        server.close((err) => {
-            if (err) {
-                reject(err);
-            } else {
-                resolve();
-            }
-        });
+        log.info(`Current working directory: ${process.cwd()}`);
     });
+});
 
-    return promise;
-}
+process.on('uncaughtException', (error) => {
+    log.fatal('Uncaught exception: ', error);
+    log.info('Uncaught exception stack: ', error.stack);
+});
 
-if (require.main === module) {
-    start(config.port);
-}
+process.on('unhandledRejection', (error: Error) => {
+    log.fatal('Uncaught exception: ', error);
+    log.info('Uncaught exception stack: ', error.stack);
+});
