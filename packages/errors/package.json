@@ -1,0 +1,7 @@
+{
+    "name": "fet-errors",
+    "main": "src/index.ts",
+    "dependencies": {
+        "typescript": "latest"
+    }
+}
