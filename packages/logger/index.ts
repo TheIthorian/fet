@@ -41,8 +41,8 @@ const logger = makeLogger(module, DEFAULT_LEVEL);
 
 export function requestLogger(): Handler {
     return function loggerMiddleware(req: Request, _: Response, next: NextFunction): void {
-        const { method, url, ip, host } = req;
-        logger.info({ method, url, ip, host }, `[${method}] - ${url}`);
+        const { method, url, ip, hostname } = req;
+        logger.info({ method, url, ip, hostname }, `[${method}] - ${url}`);
         next();
     };
 }
