@@ -40,5 +40,8 @@ module.exports = {
         'import/no-default-export': 'off',
         'prettier/prettier': ['error'],
     },
-    plugins: ['prettier'],
+    plugins: ['prettier', 'jest'],
+    env: {
+        'jest/globals': true,
+    },
 };
