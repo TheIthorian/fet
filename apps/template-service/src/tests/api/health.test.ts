@@ -1,5 +1,3 @@
-// eslint-disable-next-line eslint-comments/disable-enable-pair
-/* eslint-disable no-undef */
 import request from 'supertest';
 import type { App } from '../utils';
 import { getApp } from '../utils';
