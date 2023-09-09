@@ -1,15 +1,13 @@
 import { faker } from '@faker-js/faker';
 import request from 'supertest';
 import config from '../../config';
-import type { App } from '../utils';
 import { getApp } from '../utils';
 import { database, journeyApi } from '../../api/journey/routes';
-import type { Journey } from '../../api/journey/api';
 
 const apiKey = config.apiKey;
 
 describe('Journey', () => {
-    let app: App;
+    let app;
     const userId = faker.number.int();
 
     beforeAll(() => {
@@ -33,7 +31,7 @@ describe('Journey', () => {
                 .set({ api: apiKey })
                 .expect(200);
 
-            const { journey } = res.body as unknown as { journey: Journey & { id: string } };
+            const { journey } = res.body;
 
             expect(journey).toMatchObject({ distance: 0, userId });
             expect(new Date(journey.startTime)).toBeInstanceOf(Date);
@@ -42,7 +40,7 @@ describe('Journey', () => {
     });
 
     describe('/api/journey/:id (GET)', () => {
-        let journeyId: string;
+        let journeyId;
 
         beforeAll(async () => {
             const journey = await journeyApi.create(userId);
@@ -68,7 +66,7 @@ describe('Journey', () => {
                 .set({ api: apiKey })
                 .expect(200);
 
-            const { journey } = res.body as unknown as { journey: Journey & { id: string } };
+            const { journey } = res.body;
 
             expect(journey).toMatchObject({ distance: 0, userId });
             expect(new Date(journey.startTime)).toBeInstanceOf(Date);
