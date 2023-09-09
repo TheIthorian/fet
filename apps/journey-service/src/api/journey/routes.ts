@@ -1,6 +1,6 @@
 import expressPromiseRouter from 'express-promise-router';
 import type { Request, Response, Handler } from 'express';
-import type { Coordinates, Journey } from './api';
+import type { Coordinates, Journey } from './types';
 import { JourneyApi } from './api';
 import { MemoryDatabase } from './database';
 
@@ -36,7 +36,10 @@ async function postJourneyHandler(req: Request, res: Response): Promise<void> {
 }
 
 async function postJourneyPositionHandler(req: Request, res: Response): Promise<void> {
-    const { userId, newCoordinates } = req.body as { userId: number; newCoordinates: Coordinates };
+    const { userId, newCoordinates } = req.body as unknown as {
+        userId: number;
+        newCoordinates: Coordinates;
+    };
     const journeyId = req.params.id;
 
     const distance = await journeyApi.updateDistance({ userId, newCoordinates, journeyId });

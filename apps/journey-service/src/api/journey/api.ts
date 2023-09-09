@@ -1,18 +1,9 @@
 import { ResourceNotFoundError } from 'fet-errors';
+import { makeLogger } from 'fet-logger';
 import type { Database } from './database';
+import type { Journey, Coordinates } from './types';
 
-export interface Journey {
-    startTime: Date;
-    distance: number;
-    userId: number;
-    lastPosition?: Coordinates;
-    endTime?: Date;
-}
-
-export interface Coordinates {
-    lat: number;
-    long: number;
-}
+const log = makeLogger(module);
 
 export class JourneyApi {
     constructor(private readonly database: Database<Journey>) {}
@@ -69,9 +60,13 @@ export class JourneyApi {
         const journey = await this.get(userId, journeyId);
         await this.database.pop(journeyId);
 
+        if (!carId) {
+            return journey;
+        }
+
         journey.endTime = new Date();
 
-        console.log(carId); // Send to db
+        log.info(`${JourneyApi.name}.${this.endJourney.name}`, journey); // Send to db
 
         return journey;
     }
@@ -81,6 +76,6 @@ function calculateDistanceChange(
     previousCoordinates: Coordinates,
     currentCoordinates: Coordinates
 ): number {
-    console.log(previousCoordinates, currentCoordinates); // calculate
+    log.info(`${calculateDistanceChange.name}`, { previousCoordinates, currentCoordinates }); // Send to db
     return 1;
 }
