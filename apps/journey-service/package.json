@@ -26,6 +26,8 @@
         "ts-node": "^10.9.1"
     },
     "dependencies": {
+        "@babel/core": "^7.22.17",
+        "@babel/preset-env": "^7.22.15",
         "body-parser": "^1.20.2",
         "concurrently": "^8.2.1",
         "dotenv": "^16.3.1",
