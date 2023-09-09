@@ -7,9 +7,10 @@ export function initialiseRoutes(): Router {
     const router = Router();
 
     router.use('/api/', initHealthRoutes());
-    router.use('/api/journey/', initJourneyRoutes());
 
     router.use('/api/', authenticateApiKey);
+
+    router.use('/api/journey', initJourneyRoutes());
 
     return router;
 }
