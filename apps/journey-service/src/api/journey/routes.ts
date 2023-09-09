@@ -4,8 +4,8 @@ import type { Coordinates, Journey } from './api';
 import { JourneyApi } from './api';
 import { MemoryDatabase } from './database';
 
-const database = new MemoryDatabase<Journey>();
-const journeyApi = new JourneyApi(database);
+export const database = new MemoryDatabase<Journey>();
+export const journeyApi = new JourneyApi(database);
 
 export default function initJourneyRoutes(): Handler {
     return expressPromiseRouter()
@@ -15,11 +15,13 @@ export default function initJourneyRoutes(): Handler {
         .post('/:id/end', [postJourneyEndHandler]);
 }
 
+// TODO - Add validation
+
 async function getJourneyHandler(req: Request, res: Response): Promise<void> {
-    const { userId } = req.body as { userId: number };
+    const userId = req.query.userId as string;
     const journeyId = req.params.id;
 
-    const journey = await journeyApi.get(userId, journeyId);
+    const journey = await journeyApi.get(Number(userId), journeyId);
     res.status(200);
     res.json({ journey });
 }
