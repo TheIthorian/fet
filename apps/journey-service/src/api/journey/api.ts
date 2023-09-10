@@ -1,3 +1,4 @@
+import { ulid } from 'ulid';
 import { ResourceNotFoundError } from 'fet-errors';
 import { makeLogger } from 'fet-logger';
 import type { Database } from './database';
@@ -21,15 +22,17 @@ export class JourneyApi {
         return journey;
     }
 
-    async create(userId: number): Promise<Journey & { id: string }> {
-        const journey = {
+    async create(userId: number): Promise<Journey> {
+        const id = ulid();
+        const journey: Journey = {
+            id,
             startTime: new Date(),
             distance: 0,
             userId,
         };
 
-        const id = await this.database.put(journey);
-        return { ...journey, id };
+        await this.database.put(id, journey);
+        return journey;
     }
 
     async updateDistance(input: {
@@ -45,7 +48,7 @@ export class JourneyApi {
             newCoordinates
         );
 
-        await this.database.put(existingJourney);
+        await this.database.put(journeyId, existingJourney);
 
         return existingJourney.distance;
     }
