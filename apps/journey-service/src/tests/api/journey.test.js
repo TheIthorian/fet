@@ -40,36 +40,39 @@ describe('Journey', () => {
     });
 
     describe('/api/journey/:id (GET)', () => {
-        let journeyId;
+        let journey;
 
         beforeAll(async () => {
-            const journey = await journeyApi.create(userId);
-            journeyId = journey.id;
+            journey = await journeyApi.create(userId);
         });
 
         it('returns 401 error when invalid api key is provided', async () => {
             await request(app.express)
-                .get(`/api/journey/${journeyId}`)
+                .get(`/api/journey/${journey.id}`)
                 .set('api', ':(')
                 .expect(401)
                 .expect({ message: 'Invalid api key', name: 'ApiKeyAuthenticationError' });
         });
 
-        it('starts a new journey', async () => {
-            await database.put({
-                userId,
-                distance: 0,
-                startTime: new Date(),
+        it('returns the journey details', async () => {
+            await database.put(journey.id, {
+                ...journey,
+                distance: 123,
             });
+
             const res = await request(app.express)
-                .get(`/api/journey/${journeyId}?userId=${userId}`)
+                .get(`/api/journey/${journey.id}?userId=${userId}`)
                 .set({ api: apiKey })
                 .expect(200);
 
-            const { journey } = res.body;
+            const { journey: result } = res.body;
 
-            expect(journey).toMatchObject({ distance: 0, userId });
-            expect(new Date(journey.startTime)).toBeInstanceOf(Date);
+            expect(result).toStrictEqual({
+                id: journey.id,
+                distance: 123,
+                userId,
+                startTime: journey.startTime.toISOString(),
+            });
         });
     });
 });
