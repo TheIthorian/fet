@@ -13,10 +13,7 @@ export class JourneyApi {
         const journey = await this.database.get(journeyId);
 
         if (!journey || journey.userId !== userId) {
-            throw new ResourceNotFoundError(`Journey with id ${journeyId} not found`, {
-                userId,
-                journeyId,
-            });
+            throw new ResourceNotFoundError(`Journey with id ${journeyId} not found`);
         }
 
         return journey;
