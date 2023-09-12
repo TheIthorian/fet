@@ -50,7 +50,7 @@ async function getJourneyHandler(
     const journey = await journeyApi.get({ userId, journeyId });
 
     res.status(200);
-    res.json({ journey });
+    res.json(journey);
 }
 
 async function postJourneyHandler(
@@ -62,7 +62,7 @@ async function postJourneyHandler(
     const journey = await journeyApi.create({ userId });
 
     res.status(200);
-    res.json({ journey });
+    res.json(journey);
 }
 
 async function postJourneyPositionHandler(
@@ -76,7 +76,7 @@ async function postJourneyPositionHandler(
     const distance = await journeyApi.updateDistance({ userId, coordinates, journeyId });
 
     res.status(200);
-    res.json({ journey: distance });
+    res.json(distance);
 }
 
 async function postJourneyEndHandler(
@@ -89,5 +89,5 @@ async function postJourneyEndHandler(
     const journey = await journeyApi.endJourney({ userId, carId, journeyId });
 
     res.status(200);
-    res.json({ journey });
+    res.json(journey);
 }

@@ -8,6 +8,7 @@ import type {
     EndJourneyInput,
     EndJourneyOutput,
     GetJourneyInput,
+    GetJourneyOutput,
     Journey,
     UpdateDistanceInput,
     UpdateDistanceOutput,
@@ -19,14 +20,14 @@ const log = makeLogger(module);
 export class JourneyApi {
     constructor(private readonly database: Database<Journey>) {}
 
-    async get({ userId, journeyId }: GetJourneyInput): Promise<Journey> {
+    async get({ userId, journeyId }: GetJourneyInput): Promise<GetJourneyOutput> {
         const journey = await this.database.get(journeyId);
 
         if (!journey || journey.userId !== userId) {
             throw new ResourceNotFoundError(`Journey with id ${journeyId} not found`);
         }
 
-        return journey;
+        return { journey };
     }
 
     async create({ userId }: CreateJourneyInput): Promise<CreateJourneyOutput> {
@@ -39,12 +40,12 @@ export class JourneyApi {
         };
 
         await this.database.put(id, journey);
-        return journey;
+        return { journey };
     }
 
     async updateDistance(input: UpdateDistanceInput): Promise<UpdateDistanceOutput> {
         const { userId, coordinates, journeyId } = input;
-        const existingJourney = await this.get({ userId, journeyId });
+        const { journey: existingJourney } = await this.get({ userId, journeyId });
 
         existingJourney.distance += calculateDistanceChange(
             existingJourney.lastPosition ?? coordinates,
@@ -59,14 +60,14 @@ export class JourneyApi {
     async endJourney(input: EndJourneyInput): Promise<EndJourneyOutput> {
         const { carId, userId, journeyId } = input;
 
-        const journey = await this.get({ userId, journeyId });
+        const { journey } = await this.get({ userId, journeyId });
         await this.database.pop(journeyId);
 
         log.info(`${JourneyApi.name}.${this.endJourney.name}`, { journey, carId }); // Send to db
         journey.endTime = new Date();
         journey.carId = carId;
 
-        return journey;
+        return { journey };
     }
 }
 
