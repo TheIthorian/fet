@@ -1,5 +1,6 @@
 import { HttpCalloutError } from 'fet-errors';
 import { makeLogger } from 'fet-logger';
+import { inspect } from 'util';
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
 
@@ -11,26 +12,39 @@ interface CallOptions {
 
 const log = makeLogger(module);
 
+const DEFAULT_HEADERS = {};
+
 export class MicroserviceClient {
     constructor(
         public readonly baseUrl: string,
-        private readonly apiKey: string
-    ) {}
+        public readonly apiKey: string
+    ) {
+        log.info(
+            `Created MicroserviceClient using url: ${this.baseUrl} with apiKey: ${this.apiKey}`
+        );
+    }
 
     async call<T>(
         url: string,
         { method = 'GET', headers = {}, body = {} }: CallOptions = {}
     ): Promise<T> {
-        const response = await fetch(url, {
+        headers = { ...DEFAULT_HEADERS, ...headers, Authorization: `apikey ${this.apiKey}` };
+
+        const requestBody = body && JSON.stringify(body);
+        if (requestBody) {
+            headers['content-type'] = 'application/json';
+        }
+
+        const response = await fetch(this.baseUrl + url, {
             method,
-            headers: { ...headers, apiKey: this.apiKey },
-            body: body ? JSON.stringify(body) : null,
+            headers,
+            body: requestBody,
         });
 
         const bodyData = await getBodyFromResponse(response);
 
         if (!response.ok) {
-            log.error(`Error calling ${url}`, bodyData);
+            log.error(`Error calling ${url}` + inspect(bodyData, { depth: null, colors: true }));
             throw new HttpCalloutError(bodyData);
         }
 

@@ -6,12 +6,12 @@ import config from '../config';
 const log = makeLogger(module);
 
 export function authenticateApiKey(req: Request, _: Response, next: NextFunction): void {
-    const requestKey = req.headers.api ?? '';
+    const requestKey = req.headers.authorization ?? '(none provided)';
 
-    if (requestKey === config.apiKey) {
+    if (requestKey === `apikey ${config.apiKey}`) {
         return next();
     }
 
-    log.error(`Invalid api key: ${Array.isArray(requestKey) ? requestKey[0] : requestKey}`);
+    log.error(`Invalid api key: ${requestKey}`);
     throw new ApiKeyAuthenticationError();
 }
