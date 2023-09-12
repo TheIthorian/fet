@@ -10,7 +10,7 @@ export function initialiseRoutes(): Router {
 
     router.use('/api/', authenticateApiKey);
 
-    router.use('/api/journey', initJourneyRoutes());
+    router.use('/api/users/:userId/journey', initJourneyRoutes());
 
     return router;
 }

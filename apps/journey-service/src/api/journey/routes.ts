@@ -1,56 +1,92 @@
 import expressPromiseRouter from 'express-promise-router';
-import type { Request, Response, Handler } from 'express';
-import type { Coordinates, Journey } from './types';
+import type { Request, Handler } from 'express';
+import {
+    CreateJourneyParamSchema,
+    EndJourneyBodySchema,
+    EndJourneyParamsSchema,
+    GetJourneyParamsSchema,
+    UpdateDistanceBodySchema,
+    UpdateDistanceParamsSchema,
+} from 'fet-journey-service-client';
+import type {
+    GetJourneyInput,
+    Journey,
+    CreateJourneyInput,
+    UpdateDistanceParamsInput,
+    UpdateDistanceBodyInput,
+    EndJourneyBodyInput,
+    EndJourneyParamsInput,
+} from 'fet-journey-service-client';
+import { BodySchemaValidator, ParamSchemaValidator } from 'fet-object-schema';
+import type { ParsedBodyResponse, ParsedParamsResponse } from 'fet-object-schema';
 import { JourneyApi } from './api';
 import { MemoryDatabase } from './database';
 
 export const database = new MemoryDatabase<Journey>();
 export const journeyApi = new JourneyApi(database);
 
+type H = Handler[];
 export default function initJourneyRoutes(): Handler {
-    return expressPromiseRouter()
-        .get('/:id', [getJourneyHandler])
-        .post('/', [postJourneyHandler])
-        .post('/:id/position', [postJourneyPositionHandler])
-        .post('/:id/end', [postJourneyEndHandler]);
+    return expressPromiseRouter({ mergeParams: true })
+        .get('/:journeyId', [ParamSchemaValidator(GetJourneyParamsSchema), getJourneyHandler] as H)
+        .post('/', [ParamSchemaValidator(CreateJourneyParamSchema), postJourneyHandler] as H)
+        .post('/:journeyId/position', [
+            ParamSchemaValidator(UpdateDistanceParamsSchema),
+            BodySchemaValidator(UpdateDistanceBodySchema),
+            postJourneyPositionHandler,
+        ] as H)
+        .post('/:journeyId/end', [
+            ParamSchemaValidator(EndJourneyParamsSchema),
+            BodySchemaValidator(EndJourneyBodySchema),
+            postJourneyEndHandler,
+        ] as H);
 }
 
 // TODO - Add validation
 
-async function getJourneyHandler(req: Request, res: Response): Promise<void> {
-    const userId = req.query.userId as string;
-    const journeyId = req.params.id;
-
-    const journey = await journeyApi.get(Number(userId), journeyId);
-    res.status(200);
-    res.json({ journey });
-}
-
-async function postJourneyHandler(req: Request, res: Response): Promise<void> {
-    const { userId } = req.body as { userId: number };
-
-    const journey = await journeyApi.create(userId);
+async function getJourneyHandler(
+    _: Request,
+    res: ParsedParamsResponse<GetJourneyInput>
+): Promise<void> {
+    const { userId, journeyId } = res.locals.parsedParams;
+    const journey = await journeyApi.get({ userId, journeyId });
 
     res.status(200);
     res.json({ journey });
 }
 
-async function postJourneyPositionHandler(req: Request, res: Response): Promise<void> {
-    const { userId, newCoordinates } = req.body as unknown as {
-        userId: number;
-        newCoordinates: Coordinates;
-    };
-    const journeyId = req.params.id;
+async function postJourneyHandler(
+    _: Request,
+    res: ParsedParamsResponse<CreateJourneyInput>
+): Promise<void> {
+    const { userId } = res.locals.parsedParams;
 
-    const distance = await journeyApi.updateDistance({ userId, newCoordinates, journeyId });
+    const journey = await journeyApi.create({ userId });
 
     res.status(200);
-    res.json({ distance });
+    res.json({ journey });
 }
 
-async function postJourneyEndHandler(req: Request, res: Response): Promise<void> {
-    const { userId, carId } = req.body as { userId: number; carId: number };
-    const journeyId = req.params.id;
+async function postJourneyPositionHandler(
+    _: Request,
+    res: ParsedParamsResponse<UpdateDistanceParamsInput> &
+        ParsedBodyResponse<UpdateDistanceBodyInput>
+): Promise<void> {
+    const { coordinates } = res.locals.parsedBody;
+    const { userId, journeyId } = res.locals.parsedParams;
+
+    const distance = await journeyApi.updateDistance({ userId, coordinates, journeyId });
+
+    res.status(200);
+    res.json({ journey: distance });
+}
+
+async function postJourneyEndHandler(
+    _: Request,
+    res: ParsedBodyResponse<EndJourneyBodyInput> & ParsedParamsResponse<EndJourneyParamsInput>
+): Promise<void> {
+    const { carId } = res.locals.parsedBody;
+    const { userId, journeyId } = res.locals.parsedParams;
 
     const journey = await journeyApi.endJourney({ userId, carId, journeyId });
 

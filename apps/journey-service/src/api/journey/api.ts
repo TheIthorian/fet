@@ -1,15 +1,25 @@
 import { ulid } from 'ulid';
 import { ResourceNotFoundError } from 'fet-errors';
 import { makeLogger } from 'fet-logger';
+import type {
+    Coordinates,
+    CreateJourneyInput,
+    CreateJourneyOutput,
+    EndJourneyInput,
+    EndJourneyOutput,
+    GetJourneyInput,
+    Journey,
+    UpdateDistanceInput,
+    UpdateDistanceOutput,
+} from 'fet-journey-service-client';
 import type { Database } from './database';
-import type { Journey, Coordinates } from './types';
 
 const log = makeLogger(module);
 
 export class JourneyApi {
     constructor(private readonly database: Database<Journey>) {}
 
-    async get(userId: number, journeyId: string): Promise<Journey> {
+    async get({ userId, journeyId }: GetJourneyInput): Promise<Journey> {
         const journey = await this.database.get(journeyId);
 
         if (!journey || journey.userId !== userId) {
@@ -19,7 +29,7 @@ export class JourneyApi {
         return journey;
     }
 
-    async create(userId: number): Promise<Journey> {
+    async create({ userId }: CreateJourneyInput): Promise<CreateJourneyOutput> {
         const id = ulid();
         const journey: Journey = {
             id,
@@ -32,41 +42,29 @@ export class JourneyApi {
         return journey;
     }
 
-    async updateDistance(input: {
-        userId: number;
-        newCoordinates: Coordinates;
-        journeyId: string;
-    }): Promise<number> {
-        const { userId, newCoordinates, journeyId } = input;
-        const existingJourney = await this.get(userId, journeyId);
+    async updateDistance(input: UpdateDistanceInput): Promise<UpdateDistanceOutput> {
+        const { userId, coordinates, journeyId } = input;
+        const existingJourney = await this.get({ userId, journeyId });
 
         existingJourney.distance += calculateDistanceChange(
-            existingJourney.lastPosition ?? newCoordinates,
-            newCoordinates
+            existingJourney.lastPosition ?? coordinates,
+            coordinates
         );
 
         await this.database.put(journeyId, existingJourney);
 
-        return existingJourney.distance;
+        return { distance: existingJourney.distance };
     }
 
-    async endJourney(input: {
-        carId: number;
-        userId: number;
-        journeyId: string;
-    }): Promise<Journey> {
+    async endJourney(input: EndJourneyInput): Promise<EndJourneyOutput> {
         const { carId, userId, journeyId } = input;
 
-        const journey = await this.get(userId, journeyId);
+        const journey = await this.get({ userId, journeyId });
         await this.database.pop(journeyId);
 
-        if (!carId) {
-            return journey;
-        }
-
+        log.info(`${JourneyApi.name}.${this.endJourney.name}`, { journey, carId }); // Send to db
         journey.endTime = new Date();
-
-        log.info(`${JourneyApi.name}.${this.endJourney.name}`, journey); // Send to db
+        journey.carId = carId;
 
         return journey;
     }
@@ -76,6 +74,6 @@ function calculateDistanceChange(
     previousCoordinates: Coordinates,
     currentCoordinates: Coordinates
 ): number {
-    log.info(`${calculateDistanceChange.name}`, { previousCoordinates, currentCoordinates }); // Send to db
+    log.info(`${calculateDistanceChange.name}`, { previousCoordinates, currentCoordinates }); // Calculate
     return 1;
 }
