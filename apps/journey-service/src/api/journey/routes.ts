@@ -42,8 +42,6 @@ export default function initJourneyRoutes(): Handler {
         ] as H);
 }
 
-// TODO - Add validation
-
 async function getJourneyHandler(
     _: Request,
     res: ParsedParamsResponse<GetJourneyInput>
