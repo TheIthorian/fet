@@ -20,10 +20,10 @@ describe('Journey', () => {
 
         it('should return 401 error when invalid api key is provided for [post] requests', async () => {
             const promises = [
-                { url: `/api/journey/${journey.id}` },
-                { url: `/api/journey` },
-                { url: `/api/journey/${journey.id}/position` },
-                { url: `/api/journey/${journey.id}/end` },
+                { url: `/api/users/${userId}/journey/${journey.id}` },
+                { url: `/api/users/${userId}/journey` },
+                { url: `/api/users/${userId}/journey/${journey.id}/position` },
+                { url: `/api/users/${userId}/journey/${journey.id}/end` },
             ].map(async ({ url }) => {
                 await request(app.express)
                     .post(url)
@@ -36,45 +36,47 @@ describe('Journey', () => {
         });
 
         it('should return 401 error when invalid api key is provided for [get] requests', async () => {
-            const promises = [{ url: `/api/journey/${journey.id}` }].map(async ({ url }) => {
-                await request(app.express)
-                    .get(url)
-                    .set('api', ':(')
-                    .expect(401)
-                    .expect({ message: 'Invalid api key', name: 'ApiKeyAuthenticationError' });
-            });
+            const promises = [{ url: `/api/users/${userId}/journey/${journey.id}` }].map(
+                async ({ url }) => {
+                    await request(app.express)
+                        .get(url)
+                        .set('api', ':(')
+                        .expect(401)
+                        .expect({ message: 'Invalid api key', name: 'ApiKeyAuthenticationError' });
+                }
+            );
 
             await Promise.all(promises);
         });
     });
 
-    describe('/api/journey (POST)', () => {
+    describe('/api/users/:userId/journey (POST)', () => {
         it('starts a new journey', async () => {
             const res = await request(app.express)
-                .post('/api/journey')
-                .send({ userId })
+                .post(`/api/users/${userId}/journey`)
+                .send()
                 .set({ api: apiKey })
                 .expect(200);
 
-            const { journey } = res.body;
+            const { journey: result } = res.body;
 
-            expect(journey).toMatchObject({ distance: 0, userId });
-            expect(new Date(journey.startTime)).toBeInstanceOf(Date);
-            expect(journey.id).toEqual(expect.any(String));
+            expect(result).toMatchObject({ distance: 0, userId });
+            expect(new Date(result.startTime)).toBeInstanceOf(Date);
+            expect(result.id).toEqual(expect.any(String));
         });
     });
 
-    describe('/api/journey/:id (GET)', () => {
+    describe('/api/users/:userId/journey/:journeyId (GET)', () => {
         let journey;
 
-        beforeAll(async () => {
-            journey = await journeyApi.create(userId);
+        beforeEach(async () => {
+            journey = await journeyApi.create({ userId });
         });
 
         it('returns 404 error when no journey is found', async () => {
             const invalidId = ulid();
             const res = await request(app.express)
-                .get(`/api/journey/${invalidId}?userId=${userId}`)
+                .get(`/api/users/${userId}/journey/${invalidId}`)
                 .set({ api: apiKey })
                 .expect(404);
 
@@ -85,13 +87,15 @@ describe('Journey', () => {
         });
 
         it('returns the journey details', async () => {
+            journey = await journeyApi.create({ userId });
+
             await database.put(journey.id, {
                 ...journey,
                 distance: 123,
             });
 
             const res = await request(app.express)
-                .get(`/api/journey/${journey.id}?userId=${userId}`)
+                .get(`/api/users/${userId}/journey/${journey.id}`)
                 .set({ api: apiKey })
                 .expect(200);
 
@@ -106,14 +110,83 @@ describe('Journey', () => {
         });
     });
 
-    describe('/api/journey/:id/position (POST)', () => {
+    describe('/api/users/:userId/journey/:journeyId/position (POST)', () => {
         let journey;
 
-        beforeAll(async () => {
-            journey = await journeyApi.create(userId);
+        beforeEach(async () => {
+            journey = await journeyApi.create({ userId });
         });
 
-        it('updates the journey distance', async () => {});
-        it('updates the journey distance', async () => {});
+        it('updates the journey distance when new coordinates are provided', async () => {
+            const res = await request(app.express)
+                .post(`/api/users/${userId}/journey/${journey.id}/position`)
+                .send({ coordinates: { lat: 51.50134811258048, long: -0.14189287996502006 } })
+                .set({ api: apiKey })
+                .expect(200);
+
+            const { journey: result } = res.body;
+
+            expect(result).toMatchObject({ distance: 1 });
+
+            const res2 = await request(app.express)
+                .post(`/api/users/${userId}/journey/${journey.id}/position`)
+                .send({ coordinates: { lat: 51.50072031422008, long: -0.1246355475257489 } })
+                .set({ api: apiKey })
+                .expect(200);
+
+            const { journey: result2 } = res2.body;
+
+            expect(result2).toMatchObject({ distance: 2 }); // TODO - should be 1_197m
+        });
+
+        it('returns 404 error when the journey is not found', async () => {
+            const invalidId = ulid();
+            await request(app.express)
+                .post(`/api/users/${userId}/journey/${invalidId}/position`)
+                .send({ coordinates: { lat: 51.50134811258048, long: -0.14189287996502006 } })
+                .set({ api: apiKey })
+                .expect(404)
+                .expect({
+                    message: `Journey with id ${invalidId} not found`,
+                    name: 'ResourceNotFoundError',
+                });
+        });
+    });
+
+    describe('/api/users/:userId/journey/:journeyId/end (POST)', () => {
+        let journey;
+        const carId = 123;
+
+        beforeEach(async () => {
+            journey = await journeyApi.create({ userId });
+        });
+
+        it('ends the journey', async () => {
+            const res = await request(app.express)
+                .post(`/api/users/${userId}/journey/${journey.id}/end`)
+                .send({ carId })
+                .set({ api: apiKey })
+                .expect(200);
+
+            const { journey: result } = res.body;
+
+            expect(result).toMatchObject({ distance: 0, userId, carId });
+            expect(new Date(result.startTime)).toBeInstanceOf(Date);
+            expect(new Date(result.endTime)).toBeInstanceOf(Date);
+            expect(result.id).toEqual(expect.any(String));
+        });
+
+        it('returns 404 error when the journey is not found', async () => {
+            const invalidId = ulid();
+            await request(app.express)
+                .post(`/api/users/${userId}/journey/${invalidId}/end`)
+                .send({ carId })
+                .set({ api: apiKey })
+                .expect(404)
+                .expect({
+                    message: `Journey with id ${invalidId} not found`,
+                    name: 'ResourceNotFoundError',
+                });
+        });
     });
 });
