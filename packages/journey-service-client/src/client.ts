@@ -20,6 +20,12 @@ export interface IJourneyServiceClient {
     endJourney(input: EndJourneyInput): Promise<EndJourneyOutput>;
 }
 
+export function makeClient(baseUrl: string, apiKey: string): IJourneyServiceClient {
+    const msClient = new MicroserviceClient(baseUrl, apiKey);
+    const jsClient = new JourneyServiceClient(msClient);
+    return jsClient;
+}
+
 export class JourneyServiceClient implements IJourneyServiceClient {
     constructor(private readonly microserviceClient: MicroserviceClient) {}
 
@@ -27,14 +33,14 @@ export class JourneyServiceClient implements IJourneyServiceClient {
         const { userId, journeyId } = input;
         logContext(`${JourneyServiceClient.name}.${this.get.name}`, { userId, journeyId }, log);
 
-        return await this.microserviceClient.get(`/api/user/${userId}/journey/${journeyId}`);
+        return await this.microserviceClient.get(`/api/users/${userId}/journey/${journeyId}`);
     }
 
     async create(input: CreateJourneyInput): Promise<CreateJourneyOutput> {
         const { userId } = input;
         logContext(`${JourneyServiceClient.name}.${this.create.name}`, { userId }, log);
 
-        return await this.microserviceClient.post(`/api/user/${userId}/journey/`);
+        return await this.microserviceClient.post(`/api/users/${userId}/journey/`);
     }
 
     async updateDistance(input: UpdateDistanceInput): Promise<UpdateDistanceOutput> {
@@ -46,7 +52,7 @@ export class JourneyServiceClient implements IJourneyServiceClient {
         );
 
         return await this.microserviceClient.post(
-            `/api/user/${userId}/journey/${journeyId}/position`,
+            `/api/users/${userId}/journey/${journeyId}/position`,
             { body: { coordinates } }
         );
     }
@@ -59,7 +65,7 @@ export class JourneyServiceClient implements IJourneyServiceClient {
             log
         );
 
-        return await this.microserviceClient.post(`/api/user/${userId}/journey/${journeyId}/end`, {
+        return await this.microserviceClient.post(`/api/users/${userId}/journey/${journeyId}/end`, {
             body: { carId },
         });
     }
