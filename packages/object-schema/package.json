@@ -1,0 +1,17 @@
+{
+    "name": "fet-object-schema",
+    "version": "1.0.0",
+    "main": "index.ts",
+    "devDependencies": {
+        "eslint": "^8.47.0",
+        "prettier": "^3.0.2",
+        "prettier-config": "*",
+        "fet-errors": "*",
+        "tsconfig": "*"
+    },
+    "dependencies": {
+        "@types/express": "^4.17.17",
+        "fet-logger": "*",
+        "zod": "^3.22.2"
+    }
+}
