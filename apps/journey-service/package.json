@@ -9,7 +9,8 @@
         "test": "jest",
         "test:cov": "jest --coverage",
         "format": "prettier --write .",
-        "lint": "eslint . --ext=.ts"
+        "lint": "eslint . --ext=.ts",
+        "ci": "npm run format && npm run lint && npm run build && npm run test"
     },
     "author": "TheIthorian",
     "devDependencies": {
@@ -35,6 +36,8 @@
         "express-promise-router": "^4.1.1",
         "express-status-monitor": "^1.3.4",
         "fet-errors": "*",
+        "fet-object-schema": "*",
+        "fet-journey-service-client": "*",
         "fet-logger": "*",
         "tsconfig": "*",
         "ulid": "^2.3.0",
