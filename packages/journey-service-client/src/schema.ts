@@ -11,12 +11,12 @@ const JourneyParamsSchema = UserParamsSchema.extend({
 // Get
 export const GetJourneyParamsSchema = JourneyParamsSchema;
 export type GetJourneyInput = z.infer<typeof GetJourneyParamsSchema>;
-export type GetJourneyOutput = Journey;
+export type GetJourneyOutput = { journey: Journey };
 
 // Create
 export const CreateJourneyParamSchema = UserParamsSchema;
 export type CreateJourneyInput = z.infer<typeof CreateJourneyParamSchema>;
-export type CreateJourneyOutput = Journey;
+export type CreateJourneyOutput = { journey: Journey };
 
 // Position
 export const UpdateDistanceParamsSchema = JourneyParamsSchema;
@@ -42,4 +42,4 @@ export const EndJourneyBodySchema = z.object({
 export type EndJourneyParamsInput = z.infer<typeof EndJourneyParamsSchema>;
 export type EndJourneyBodyInput = z.infer<typeof EndJourneyBodySchema>;
 export type EndJourneyInput = EndJourneyParamsInput & EndJourneyBodyInput;
-export type EndJourneyOutput = Journey;
+export type EndJourneyOutput = { journey: Journey };
