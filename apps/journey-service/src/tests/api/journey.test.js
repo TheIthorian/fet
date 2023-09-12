@@ -5,7 +5,7 @@ import config from '../../config';
 import { getApp } from '../utils';
 import { database, journeyApi } from '../../api/journey/routes';
 
-const apiKey = config.apiKey;
+const apiKey = `apikey ${config.apiKey}`;
 
 describe('Journey', () => {
     let app;
@@ -27,7 +27,7 @@ describe('Journey', () => {
             ].map(async ({ url }) => {
                 await request(app.express)
                     .post(url)
-                    .set('api', ':(')
+                    .set({ Authorization: 'apikey :(' })
                     .expect(401)
                     .expect({ message: 'Invalid api key', name: 'ApiKeyAuthenticationError' });
             });
@@ -40,7 +40,7 @@ describe('Journey', () => {
                 async ({ url }) => {
                     await request(app.express)
                         .get(url)
-                        .set('api', ':(')
+                        .set({ Authorisation: 'apikey :(' })
                         .expect(401)
                         .expect({ message: 'Invalid api key', name: 'ApiKeyAuthenticationError' });
                 }
@@ -55,7 +55,7 @@ describe('Journey', () => {
             const res = await request(app.express)
                 .post(`/api/users/${userId}/journey`)
                 .send()
-                .set({ api: apiKey })
+                .set({ Authorization: apiKey })
                 .expect(200);
 
             const { journey: result } = res.body;
@@ -70,14 +70,14 @@ describe('Journey', () => {
         let journey;
 
         beforeEach(async () => {
-            journey = await journeyApi.create({ userId });
+            ({ journey } = await journeyApi.create({ userId }));
         });
 
         it('returns 404 error when no journey is found', async () => {
             const invalidId = ulid();
             const res = await request(app.express)
                 .get(`/api/users/${userId}/journey/${invalidId}`)
-                .set({ api: apiKey })
+                .set({ Authorization: apiKey })
                 .expect(404);
 
             expect(res.body).toStrictEqual({
@@ -87,7 +87,7 @@ describe('Journey', () => {
         });
 
         it('returns the journey details', async () => {
-            journey = await journeyApi.create({ userId });
+            ({ journey } = await journeyApi.create({ userId }));
 
             await database.put(journey.id, {
                 ...journey,
@@ -96,7 +96,7 @@ describe('Journey', () => {
 
             const res = await request(app.express)
                 .get(`/api/users/${userId}/journey/${journey.id}`)
-                .set({ api: apiKey })
+                .set({ Authorization: apiKey })
                 .expect(200);
 
             const { journey: result } = res.body;
@@ -114,29 +114,27 @@ describe('Journey', () => {
         let journey;
 
         beforeEach(async () => {
-            journey = await journeyApi.create({ userId });
+            ({ journey } = await journeyApi.create({ userId }));
         });
 
         it('updates the journey distance when new coordinates are provided', async () => {
             const res = await request(app.express)
                 .post(`/api/users/${userId}/journey/${journey.id}/position`)
                 .send({ coordinates: { lat: 51.50134811258048, long: -0.14189287996502006 } })
-                .set({ api: apiKey })
+                .set({ Authorization: apiKey })
                 .expect(200);
 
-            const { journey: result } = res.body;
-
-            expect(result).toMatchObject({ distance: 1 });
+            const distance = res.body.distance;
+            expect(distance).toBe(1);
 
             const res2 = await request(app.express)
                 .post(`/api/users/${userId}/journey/${journey.id}/position`)
                 .send({ coordinates: { lat: 51.50072031422008, long: -0.1246355475257489 } })
-                .set({ api: apiKey })
+                .set({ Authorization: apiKey })
                 .expect(200);
 
-            const { journey: result2 } = res2.body;
-
-            expect(result2).toMatchObject({ distance: 2 }); // TODO - should be 1_197m
+            const distance2 = res2.body.distance;
+            expect(distance2).toBe(2);
         });
 
         it('returns 404 error when the journey is not found', async () => {
@@ -144,7 +142,7 @@ describe('Journey', () => {
             await request(app.express)
                 .post(`/api/users/${userId}/journey/${invalidId}/position`)
                 .send({ coordinates: { lat: 51.50134811258048, long: -0.14189287996502006 } })
-                .set({ api: apiKey })
+                .set({ Authorization: apiKey })
                 .expect(404)
                 .expect({
                     message: `Journey with id ${invalidId} not found`,
@@ -158,14 +156,14 @@ describe('Journey', () => {
         const carId = 123;
 
         beforeEach(async () => {
-            journey = await journeyApi.create({ userId });
+            ({ journey } = await journeyApi.create({ userId }));
         });
 
         it('ends the journey', async () => {
             const res = await request(app.express)
                 .post(`/api/users/${userId}/journey/${journey.id}/end`)
                 .send({ carId })
-                .set({ api: apiKey })
+                .set({ Authorization: apiKey })
                 .expect(200);
 
             const { journey: result } = res.body;
@@ -181,7 +179,7 @@ describe('Journey', () => {
             await request(app.express)
                 .post(`/api/users/${userId}/journey/${invalidId}/end`)
                 .send({ carId })
-                .set({ api: apiKey })
+                .set({ Authorization: apiKey })
                 .expect(404)
                 .expect({
                     message: `Journey with id ${invalidId} not found`,
