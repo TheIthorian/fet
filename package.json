@@ -14,13 +14,15 @@
         "tsconfig": "*",
         "turbo": "latest"
     },
-    "name": "example-monorepo",
+    "name": "fet-monorepo",
     "packageManager": "npm@8.5.1",
     "workspaces": [
         "apps/*",
         "packages/*"
     ],
     "dependencies": {
-        "dotenv-cli": "^7.3.0"
+        "cd": "^0.3.3",
+        "dotenv-cli": "^7.3.0",
+        "fet-monorepo": "file:"
     }
 }
