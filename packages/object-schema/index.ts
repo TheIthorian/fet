@@ -8,13 +8,15 @@ const log = makeLogger(module);
 export function QuerySchemaValidator<SchemaType extends z.ZodType>(
     schema: SchemaType
 ): RequestHandler {
+    const ctx = logContext(QuerySchemaValidator.name, {}, log);
     return function schemaValidation(req, res, next) {
+        log.info(`${ctx} - validating query (${req.query ?? 'no query'})`);
         const result = validateData(schema, req.query ?? {});
 
         if (!result.success) {
             const error = result.error;
             log.error(error, 'QuerySchemaValidator - validation failed');
-            throw new SchemaValidationError('query', error);
+            throw new SchemaValidationError('query', JSON.parse(error.message));
         } else {
             res.locals.parsedQuery = result.data;
         }
@@ -26,13 +28,15 @@ export function QuerySchemaValidator<SchemaType extends z.ZodType>(
 export function BodySchemaValidator<SchemaType extends z.ZodType>(
     schema: SchemaType
 ): RequestHandler {
+    const ctx = logContext(BodySchemaValidator.name, {}, log);
     return function schemaValidation(req, res, next) {
+        log.info(`${ctx} - validating body (${req.body ? JSON.stringify(req.body) : 'no body'})`);
         const result = validateData(schema, req.body ?? {});
 
         if (!result.success) {
             const error = result.error;
-            log.error(error, 'BodySchemaValidator - validation failed');
-            throw new SchemaValidationError('body', error);
+            log.error('BodySchemaValidator - validation failed', error.format());
+            throw new SchemaValidationError('body', JSON.parse(error.message));
         } else {
             res.locals.parsedBody = result.data;
         }
@@ -52,7 +56,7 @@ export function ParamSchemaValidator<SchemaType extends z.ZodType>(
         if (!result.success) {
             const error = result.error;
             log.error(error, 'ParamSchemaValidator - validation failed');
-            throw new SchemaValidationError('params', error);
+            throw new SchemaValidationError('params', JSON.parse(error.message));
         } else {
             res.locals.parsedParams = result.data;
             log.info(

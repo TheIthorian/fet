@@ -52,8 +52,8 @@ export function logContext(
     dataObject: Record<string, string | null | number | Date>,
     log?: Logger
 ) {
-    const objectString = Object.values(dataObject)
-        .map((value) => `[${value?.toString()}]`)
+    const objectString = Object.entries(dataObject)
+        .map(([key, value]) => `[${key} : ${value?.toString()}]`)
         .join(', ');
 
     const delimiter = objectString ? ' - ' : '';
