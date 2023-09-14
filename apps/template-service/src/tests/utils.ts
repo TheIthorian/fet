@@ -20,7 +20,7 @@ export function getApp(): App {
     app = {
         express: expressApp,
         async shutdown(): Promise<void> {
-            await setTimeout(100);
+            await setTimeout(0);
             await shutdownApp();
             app = null;
         },

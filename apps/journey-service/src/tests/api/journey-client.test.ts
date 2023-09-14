@@ -1,8 +1,8 @@
 import { faker } from '@faker-js/faker';
 import { makeClient } from 'fet-journey-service-client';
 import config from '../../config';
+import type { App } from '../utils';
 import { getApp } from '../utils';
-import { startHttpServer } from '../../server';
 
 const apiKey = config.apiKey;
 const jsClient = makeClient(`http://${config.host}:${config.port}`, apiKey);
@@ -10,10 +10,14 @@ const jsClient = makeClient(`http://${config.host}:${config.port}`, apiKey);
 describe('JourneyServiceClient', () => {
     const userId = faker.number.int();
     const carId = faker.number.int();
+    let app: App;
 
     beforeAll(async () => {
-        const app = getApp();
-        await startHttpServer(app.express, config);
+        app = await getApp();
+    });
+
+    afterAll(async () => {
+        await app.shutdown();
     });
 
     describe('happy path', () => {

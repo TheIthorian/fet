@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker';
-import request from 'supertest';
+import { agent } from 'supertest';
 import { ulid } from 'ulid';
 import config from '../../config';
 import { getApp } from '../utils';
@@ -10,49 +10,55 @@ const apiKey = `apikey ${config.apiKey}`;
 describe('Journey', () => {
     let app;
     const userId = faker.number.int();
+    let stAgent;
 
-    beforeAll(() => {
-        app = getApp();
+    beforeAll(async () => {
+        app = await getApp();
+        stAgent = agent(app.server);
+    });
+
+    afterAll(async () => {
+        await app.shutdown();
     });
 
     describe('resource', () => {
         const journey = ulid();
 
         it('should return 401 error when invalid api key is provided for [post] requests', async () => {
-            const promises = [
+            for (const { url } of [
                 { url: `/api/users/${userId}/journey/${journey.id}` },
                 { url: `/api/users/${userId}/journey` },
                 { url: `/api/users/${userId}/journey/${journey.id}/position` },
                 { url: `/api/users/${userId}/journey/${journey.id}/end` },
-            ].map(async ({ url }) => {
-                await request(app.express)
+            ]) {
+                // eslint-disable-next-line no-await-in-loop
+                await stAgent
                     .post(url)
                     .set({ Authorization: 'apikey :(' })
                     .expect(401)
                     .expect({ message: 'Invalid api key', name: 'ApiKeyAuthenticationError' });
-            });
+            }
 
-            await Promise.all(promises);
+            await Promise.resolve();
         });
 
         it('should return 401 error when invalid api key is provided for [get] requests', async () => {
-            const promises = [{ url: `/api/users/${userId}/journey/${journey.id}` }].map(
-                async ({ url }) => {
-                    await request(app.express)
-                        .get(url)
-                        .set({ Authorisation: 'apikey :(' })
-                        .expect(401)
-                        .expect({ message: 'Invalid api key', name: 'ApiKeyAuthenticationError' });
-                }
-            );
+            for (const { url } of [{ url: `/api/users/${userId}/journey/${journey.id}` }]) {
+                // eslint-disable-next-line no-await-in-loop
+                await stAgent
+                    .get(url)
+                    .set({ Authorisation: 'apikey :(' })
+                    .expect(401)
+                    .expect({ message: 'Invalid api key', name: 'ApiKeyAuthenticationError' });
+            }
 
-            await Promise.all(promises);
+            await Promise.resolve();
         });
     });
 
     describe('/api/users/:userId/journey (POST)', () => {
         it('starts a new journey', async () => {
-            const res = await request(app.express)
+            const res = await stAgent
                 .post(`/api/users/${userId}/journey`)
                 .send()
                 .set({ Authorization: apiKey })
@@ -75,7 +81,7 @@ describe('Journey', () => {
 
         it('returns 404 error when no journey is found', async () => {
             const invalidId = ulid();
-            const res = await request(app.express)
+            const res = await stAgent
                 .get(`/api/users/${userId}/journey/${invalidId}`)
                 .set({ Authorization: apiKey })
                 .expect(404);
@@ -94,7 +100,7 @@ describe('Journey', () => {
                 distance: 123,
             });
 
-            const res = await request(app.express)
+            const res = await stAgent
                 .get(`/api/users/${userId}/journey/${journey.id}`)
                 .set({ Authorization: apiKey })
                 .expect(200);
@@ -118,7 +124,7 @@ describe('Journey', () => {
         });
 
         it('updates the journey distance when new coordinates are provided', async () => {
-            const res = await request(app.express)
+            const res = await stAgent
                 .post(`/api/users/${userId}/journey/${journey.id}/position`)
                 .send({ coordinates: { lat: 51.50134811258048, long: -0.14189287996502006 } })
                 .set({ Authorization: apiKey })
@@ -127,7 +133,7 @@ describe('Journey', () => {
             const distance = res.body.distance;
             expect(distance).toBe(1);
 
-            const res2 = await request(app.express)
+            const res2 = await stAgent
                 .post(`/api/users/${userId}/journey/${journey.id}/position`)
                 .send({ coordinates: { lat: 51.50072031422008, long: -0.1246355475257489 } })
                 .set({ Authorization: apiKey })
@@ -139,7 +145,7 @@ describe('Journey', () => {
 
         it('returns 404 error when the journey is not found', async () => {
             const invalidId = ulid();
-            await request(app.express)
+            await stAgent
                 .post(`/api/users/${userId}/journey/${invalidId}/position`)
                 .send({ coordinates: { lat: 51.50134811258048, long: -0.14189287996502006 } })
                 .set({ Authorization: apiKey })
@@ -160,7 +166,7 @@ describe('Journey', () => {
         });
 
         it('ends the journey', async () => {
-            const res = await request(app.express)
+            const res = await stAgent
                 .post(`/api/users/${userId}/journey/${journey.id}/end`)
                 .send({ carId })
                 .set({ Authorization: apiKey })
@@ -176,7 +182,7 @@ describe('Journey', () => {
 
         it('returns 404 error when the journey is not found', async () => {
             const invalidId = ulid();
-            await request(app.express)
+            await stAgent
                 .post(`/api/users/${userId}/journey/${invalidId}/end`)
                 .send({ carId })
                 .set({ Authorization: apiKey })
