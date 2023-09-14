@@ -1,15 +1,22 @@
-import request from 'supertest';
+import type { SuperAgentTest } from 'supertest';
+import { agent } from 'supertest';
 import type { App } from '../utils';
 import { getApp } from '../utils';
 
 describe('Health', () => {
     let app: App;
+    let stAgent: SuperAgentTest;
 
-    beforeAll(() => {
-        app = getApp();
+    beforeAll(async () => {
+        app = await getApp();
+        stAgent = agent(app.server);
+    });
+
+    afterAll(async () => {
+        await app.shutdown();
     });
 
     it('/api/health (GET) - responds with ok', async () => {
-        await request(app.express).get('/api/health').expect(200).expect('ok');
+        await stAgent.get('/api/health').expect(200).expect('ok');
     });
 });

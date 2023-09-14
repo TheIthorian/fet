@@ -46,3 +46,20 @@ export function requestLogger(): Handler {
         next();
     };
 }
+
+export function logContext(
+    functionName: string,
+    dataObject: Record<string, string | null | number | Date>,
+    log?: Logger
+) {
+    const objectString = Object.entries(dataObject)
+        .map(([key, value]) => `[${key} : ${value?.toString()}]`)
+        .join(', ');
+
+    const delimiter = objectString ? ' - ' : '';
+    const ctx = `${functionName}${delimiter}${objectString}`;
+
+    log?.info(ctx);
+
+    return ctx;
+}

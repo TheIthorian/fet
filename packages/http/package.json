@@ -1,0 +1,15 @@
+{
+    "name": "fet-http",
+    "version": "1.0.0",
+    "main": "index.ts",
+    "devDependencies": {
+        "eslint": "^8.47.0",
+        "prettier": "^3.0.2",
+        "prettier-config": "*",
+        "tsconfig": "*"
+    },
+    "dependencies": {
+        "fet-logger": "*",
+        "fet-errors": "*"
+    }
+}

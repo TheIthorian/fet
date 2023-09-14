@@ -66,3 +66,17 @@ export class TokenError extends AppError<object> {
         super('Unable to verify token', TokenError.name, { data: { cause } });
     }
 }
+
+export class HttpCalloutError extends AppError<object> {
+    status = 500;
+    constructor(body: any) {
+        super('Error calling service', HttpCalloutError.name, { data: { body } });
+    }
+}
+
+export class SchemaValidationError extends AppError<object> {
+    status = 400;
+    constructor(type: string, validationError: any) {
+        super('Invalid request: ', SchemaValidationError.name, { data: { type, validationError } });
+    }
+}

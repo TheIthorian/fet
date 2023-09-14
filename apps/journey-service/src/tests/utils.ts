@@ -1,15 +1,18 @@
+import { createServer as createHttpServer, type Server } from 'node:http';
 import { setTimeout } from 'node:timers/promises';
 import type { Express } from 'express';
 import express from 'express';
 import { startup } from '../express';
+import config from '../config';
 
 export interface App {
     express: Express;
+    server: Server;
     shutdown: () => Promise<void>;
 }
 
 let app: App | null = null;
-export function getApp(): App {
+export async function getApp(): Promise<App> {
     if (app) {
         return app;
     }
@@ -17,11 +20,20 @@ export function getApp(): App {
     const expressApp = express();
     const shutdownApp = startup(expressApp);
 
+    const server = createHttpServer(expressApp);
+
+    await Promise.resolve();
+    server.listen(config.port, config.host);
+    await Promise.resolve();
+
     app = {
         express: expressApp,
+        server,
         async shutdown(): Promise<void> {
-            await setTimeout(100);
             await shutdownApp();
+            server.close();
+            server.unref();
+            await setTimeout(0);
             app = null;
         },
     };
