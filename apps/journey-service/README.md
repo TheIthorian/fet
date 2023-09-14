@@ -20,9 +20,10 @@ Uses default port of `3010`
 
 ## Api Endpoints
 
-| Route                         | Description                               |
-| ----------------------------- | ----------------------------------------- |
-| `POST api/health`             | Check service health                      |
-| `POST api/journey`            | Create a new journey                      |
-| `POST api/journey/:journeyId` | Add new positional reading to the journey |
-| `GET api/journey/:journeyId`  | Get current distance travelled on journey |
+| Route                                                | Description                               |
+| ---------------------------------------------------- | ----------------------------------------- |
+| `GET api/health`                                     | Check service health                      |
+| `POST api/users/:userId/journey`                     | Create a new journey                      |
+| `GET api/users/:userId/journey/:journeyId`           | Get journey details                       |
+| `POST api/users/:userId/journey/:journeyId/position` | Add new positional reading to the journey |
+| `POST api/users/:userId/journey/:journeyId/end`      | Complete the journey                      |
