@@ -3,14 +3,9 @@ import type { Express } from 'express';
 import bodyParser from 'body-parser';
 import expressStatusMonitor from 'express-status-monitor';
 //app
-import { makeLogger, requestLogger } from 'fet-logger';
+import { requestLogger } from 'fet-logger';
 import { initialiseRoutes } from './routes';
-import config from './config';
 import { errorHandler } from './middleware/error-handlers';
-
-const log = makeLogger(module);
-
-log.info({ config });
 
 export function initExpressApp(app: Express): Express {
     app.use(requestLogger());

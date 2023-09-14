@@ -4,8 +4,8 @@
     "main": "app.ts",
     "scripts": {
         "build": "tsc",
-        "start": "ts-node src/app.ts | pino-pretty",
-        "dev": "nodemon src/app.ts | pino-pretty",
+        "start": "echo \"ts-node src/app.ts | pino-pretty\"",
+        "dev": "echo \"nodemon src/app.ts | pino-pretty\"",
         "test": "jest",
         "test:cov": "jest --coverage",
         "format": "prettier --write .",
