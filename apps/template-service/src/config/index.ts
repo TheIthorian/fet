@@ -13,7 +13,7 @@ export default {
     host: process.env.TEMPLATE_SERVICE_HOST ?? '127.0.0.1',
     port: Number(process.env.TEMPLATE_SERVICE_PORT ?? 3010),
 
-    apiKey: 'internal_api',
+    apiKey: 'internal_key',
 
     isTest: process.env.TEMPLATE_SERVICE_NODE_ENV === 'test',
 };

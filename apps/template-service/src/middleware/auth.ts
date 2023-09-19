@@ -7,7 +7,7 @@ const log = makeLogger(module);
 export function authenticateApiKey(req: Request, _: Response, next: NextFunction): void {
     const requestKey = req.headers.api ?? '';
 
-    if (requestKey === 'internal_api') {
+    if (requestKey === 'internal_key') {
         return next();
     }
 
