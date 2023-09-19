@@ -29,6 +29,8 @@ Route.post('login', 'AuthController.login');
 Route.post('logout', 'AuthController.logout').middleware('auth');
 Route.get('api/me', 'AuthController.me').middleware('auth');
 
+Route.post('api/journey/:journeyId', 'JourneyController.updateDistance');
+
 Route.group(() => {
     Route.resource('me/config', 'UserConfigsController').apiOnly();
 
