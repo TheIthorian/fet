@@ -11,7 +11,8 @@ export default class extends BaseSchema {
                 .unsigned()
                 .references('id')
                 .inTable('users')
-                .onDelete('CASCADE');
+                .onDelete('CASCADE')
+                .index();
             table.string('name').notNullable();
             table.string('type').notNullable();
             table.string('token', 64).notNullable().unique();

@@ -6,11 +6,11 @@ export default class extends BaseSchema {
     public async up() {
         this.schema.createTable(this.tableName, (table) => {
             table.increments('id').primary();
-            table.string('email', 255).notNullable().unique();
+            table.string('email', 255).notNullable().unique().index();
             table.string('password', 180).notNullable();
             table.string('remember_me_token').nullable();
             table.integer('email_verified_ind').notNullable().checkIn(['5', '6']); // TODO - Should this be string?
-            table.integer('status').notNullable().checkIn(['0', '1']);
+            table.integer('status').notNullable().checkIn(['0', '1']).index();
 
             /**
              * Uses timestampz for PostgreSQL and DATETIME2 for MSSQL
