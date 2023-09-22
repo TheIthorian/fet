@@ -1,3 +1,4 @@
+import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
 /*
 |--------------------------------------------------------------------------
 | Http Exception Handler
@@ -19,5 +20,16 @@ import HttpExceptionHandler from '@ioc:Adonis/Core/HttpExceptionHandler';
 export default class ExceptionHandler extends HttpExceptionHandler {
     constructor() {
         super(Logger);
+    }
+
+    public async handle(error: any, ctx: HttpContextContract) {
+        this.logger.warn(error.message);
+
+        if (!error.status || error.status === 500) {
+            return super.handle({ message: 'unexpected server error', code: 'UNKNOWN' }, ctx);
+        }
+
+        const { message, code } = error;
+        return super.handle({ message, code }, ctx);
     }
 }
