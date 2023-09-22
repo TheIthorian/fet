@@ -1,7 +1,6 @@
 import Module from 'module';
 import { createWriteStream } from 'fs';
 import { pino } from 'pino';
-import { multistream } from 'pino-multi-stream';
 import type { NextFunction, Request, Response, Handler } from 'express';
 
 const DEFAULT_LEVEL = 'debug';
@@ -30,11 +29,13 @@ export function makeLogger(module: Module | undefined, level = DEFAULT_LEVEL): L
 
     let name = 'unknown';
     if (module?.filename) {
-        const modulePath = module.filename?.split('\\') ?? [];
-        name = `${modulePath.join(', ')}`;
+        const modulePath = module.filename?.split('apps')[1]?.split('\\') ?? [];
+        const lastPart = [modulePath[modulePath.length - 2], modulePath[modulePath.length - 1]];
+        name = `${lastPart.join('/')}`;
+        console.log({ name });
     }
 
-    return pino({ level, name }, multistream(streams));
+    return pino({ level, name }, pino.multistream(streams));
 }
 
 const logger = makeLogger(module, DEFAULT_LEVEL);
@@ -49,7 +50,7 @@ export function requestLogger(): Handler {
 
 export function logContext(
     functionName: string,
-    dataObject: Record<string, string | null | number | Date>,
+    dataObject: Record<string, string | null | number | Date> = {},
     log?: Logger
 ) {
     const objectString = Object.entries(dataObject)
