@@ -29,6 +29,13 @@ Route.post('login', 'AuthController.login');
 Route.post('logout', 'AuthController.logout').middleware('auth');
 Route.get('api/me', 'AuthController.me').middleware('auth');
 
+Route.get('api/me/integrations', 'IntegrationApiKeysController.index').middleware('auth');
+Route.post(
+    'api/me/integrations/:integration_name',
+    'IntegrationApiKeysController.create'
+).middleware('auth');
+
+Route.post('api/location/owntracks', 'OwntracksLocationController.handlePositionUpdate');
 Route.post('api/journey/:journeyId', 'JourneyController.updateDistance');
 
 Route.group(() => {
