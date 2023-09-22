@@ -43,6 +43,7 @@
         "reflect-metadata": "^0.1.13",
         "source-map-support": "^0.5.21",
         "fet-journey-service-client": "*",
+        "fet-logger": "*",
         "sqlite3": "^5.1.6"
     }
 }
