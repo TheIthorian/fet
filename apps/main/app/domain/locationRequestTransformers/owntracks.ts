@@ -3,7 +3,7 @@ import { schema } from '@ioc:Adonis/Core/Validator';
 import { LocationTransformer, TransformOutput } from './types';
 import { ApiKeyService } from 'App/service/integrationKey';
 import ApiKeyNotRecognisedException from 'App/Exceptions/ApiKeyNotRecognisedException';
-import { logContext } from 'fet-logger';
+import { logContext } from 'App/util/logger';
 import Logger from '@ioc:Adonis/Core/Logger';
 
 export class OwntracksTransformer implements LocationTransformer {

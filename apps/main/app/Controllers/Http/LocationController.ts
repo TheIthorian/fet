@@ -2,7 +2,7 @@ import Logger from '@ioc:Adonis/Core/Logger';
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
 import UnknownIntegrationException from 'App/Exceptions/UnknownIntegrationException';
 import { transformersByIntegrationName } from 'App/domain/locationRequestTransformers';
-import { logContext } from 'fet-logger';
+import { logContext } from 'App/util/logger';
 
 export default class LocationController {
     public async handlePositionUpdate({ request, response }: HttpContextContract) {
