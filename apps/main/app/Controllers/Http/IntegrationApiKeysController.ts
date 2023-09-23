@@ -47,11 +47,16 @@ export default class IntegrationApiKeysController {
             throw UnknownIntegrationException.new(integrationName);
         }
 
-        const apiKey = integrationApiKeyService.generateApiKeyForUser({
+        const newRelation = await integrationApiKeyService.generateApiKeyForUser({
             userId: user.id,
             integrationId: integration.id,
         });
 
-        response.json({ apiKey });
+        response.status(201).json({
+            api_key: newRelation.apiKey,
+            name: integrationName,
+            created_at: newRelation.createdAt,
+            updated_at: newRelation.updatedAt,
+        });
     }
 }

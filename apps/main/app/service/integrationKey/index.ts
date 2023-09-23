@@ -33,7 +33,7 @@ export class IntegrationApiKeyService implements ApiKeyService {
     public async generateApiKeyForUser({
         userId,
         integrationId,
-    }: GenerateApiKeyForUserInput): Promise<string> {
+    }: GenerateApiKeyForUserInput): Promise<UserIntegration> {
         const ctx = logContext(
             `${IntegrationApiKeyService.name}.${this.generateApiKeyForUser.name}`,
             { userId, integrationId },
@@ -52,16 +52,14 @@ export class IntegrationApiKeyService implements ApiKeyService {
             Logger.info(`${ctx} existing relation exists. Replacing existing key`);
             existingRelation.apiKey = apiKey;
             await existingRelation.save();
-            return apiKey;
+            existingRelation;
         }
 
         Logger.info(`${ctx} creating new relation`);
-        await UserIntegration.create({
+        return await UserIntegration.create({
             userId,
             apiKey,
             integrationId,
         });
-
-        return apiKey;
     }
 }

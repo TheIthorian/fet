@@ -1,3 +1,5 @@
+import UserIntegration from 'App/Models/UserIntegration';
+
 export type GetUserIdByIntegrationKeyInput = {
     apiKey: string;
     integrationName: string;
@@ -14,5 +16,8 @@ export interface ApiKeyService {
         integrationName,
     }: GetUserIdByIntegrationKeyInput): Promise<number | undefined>;
 
-    generateApiKeyForUser({ userId, integrationId }: GenerateApiKeyForUserInput): Promise<string>;
+    generateApiKeyForUser({
+        userId,
+        integrationId,
+    }: GenerateApiKeyForUserInput): Promise<UserIntegration>;
 }
