@@ -33,6 +33,7 @@ test.group('api/vehicles', (group) => {
     }) => {
         const response = await client.post('/api/vehicles').json(vehicle);
 
+        response.assertStatus(401);
         response.assertBodyContains({
             errors: [{ message: 'E_UNAUTHORIZED_ACCESS: Unauthorized access' }],
         });
@@ -90,6 +91,7 @@ test.group('api/vehicles', (group) => {
     }) => {
         const response = await client.get('/api/vehicles').json(vehicle);
 
+        response.assertStatus(401);
         response.assertBodyContains({
             errors: [{ message: 'E_UNAUTHORIZED_ACCESS: Unauthorized access' }],
         });
