@@ -3,9 +3,16 @@ export type GetUserIdByIntegrationKeyInput = {
     integrationName: string;
 };
 
+export type GenerateApiKeyForUserInput = {
+    userId: number;
+    integrationId: number;
+};
+
 export interface ApiKeyService {
     getUserIdByIntegrationKey({
         apiKey,
         integrationName,
     }: GetUserIdByIntegrationKeyInput): Promise<number | undefined>;
+
+    generateApiKeyForUser({ userId, integrationId }: GenerateApiKeyForUserInput): Promise<string>;
 }

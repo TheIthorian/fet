@@ -1,11 +1,12 @@
-import crypto from 'node:crypto';
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
 import Integration from 'App/Models/Integration';
-import UserIntegration from 'App/Models/UserIntegration';
 import UnknownIntegrationException from 'App/Exceptions/UnknownIntegrationException';
 import Logger from '@ioc:Adonis/Core/Logger';
 import Database from '@ioc:Adonis/Lucid/Database';
-import { logContext } from 'fet-logger';
+import { logContext } from 'App/util/logger';
+import { IntegrationApiKeyService } from 'App/service/integrationKey';
+
+const integrationApiKeyService = new IntegrationApiKeyService();
 
 export default class IntegrationApiKeysController {
     /**
@@ -39,9 +40,6 @@ export default class IntegrationApiKeysController {
     public async create({ request, response, auth }: HttpContextContract) {
         const user = await auth.use('api').authenticate();
 
-        const buffer = crypto.randomBytes(32);
-        const apiKey = buffer.toString('hex').toUpperCase();
-
         const integrationName = request.param('integration_name');
 
         const integration = await Integration.findBy('name', integrationName);
@@ -49,20 +47,8 @@ export default class IntegrationApiKeysController {
             throw UnknownIntegrationException.new(integrationName);
         }
 
-        const [existingRelation] = await UserIntegration.query()
-            .select(['id'])
-            .from('user_integrations')
-            .where('integration_id', integration.id)
-            .andWhere('user_id', user.id);
-        if (existingRelation) {
-            existingRelation.apiKey = apiKey;
-            await existingRelation.save();
-            return response.json({ apiKey });
-        }
-
-        await UserIntegration.create({
+        const apiKey = integrationApiKeyService.generateApiKeyForUser({
             userId: user.id,
-            apiKey,
             integrationId: integration.id,
         });
 
