@@ -10,7 +10,6 @@
     },
     "dependencies": {
         "@types/pino": "^7.0.5",
-        "pino": "^8.15.0",
-        "pino-multi-stream": "^6.0.0"
+        "pino": "^8.15.0"
     }
 }

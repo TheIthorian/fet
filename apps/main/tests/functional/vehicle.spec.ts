@@ -33,6 +33,7 @@ test.group('api/vehicles', (group) => {
     }) => {
         const response = await client.post('/api/vehicles').json(vehicle);
 
+        response.assertStatus(401);
         response.assertBodyContains({
             errors: [{ message: 'E_UNAUTHORIZED_ACCESS: Unauthorized access' }],
         });
@@ -69,6 +70,7 @@ test.group('api/vehicles', (group) => {
 
         response.assertBodyContains({
             message: `E_VEHICLE_EXISTS: A vehicle with registration number ${vehicle.reg_no.toUpperCase()} has already been added`,
+            code: 'E_VEHICLE_EXISTS',
         });
     });
 
@@ -89,6 +91,7 @@ test.group('api/vehicles', (group) => {
     }) => {
         const response = await client.get('/api/vehicles').json(vehicle);
 
+        response.assertStatus(401);
         response.assertBodyContains({
             errors: [{ message: 'E_UNAUTHORIZED_ACCESS: Unauthorized access' }],
         });

@@ -12,6 +12,6 @@ export function authenticateApiKey(req: Request, _: Response, next: NextFunction
         return next();
     }
 
-    log.error(`Invalid api key: ${requestKey}`);
+    log.error(`Invalid api key: ${requestKey}. Expected ${config.apiKey}`);
     throw new ApiKeyAuthenticationError();
 }

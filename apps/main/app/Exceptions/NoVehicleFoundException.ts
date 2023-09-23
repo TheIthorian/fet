@@ -1,6 +1,6 @@
-import { Exception } from '@adonisjs/core/build/standalone';
+import { AppException } from './AppException';
 
-export default class VehicleNotFound extends Exception {
+export default class VehicleNotFound extends AppException {
     public static new(vehicleId: string | number) {
         return new VehicleNotFound(
             `The vehicle with id ${vehicleId} could not be found`,

@@ -1,3 +1,4 @@
+import fs from 'fs';
 import type { ApplicationContract } from '@ioc:Adonis/Core/Application';
 
 export default class AppProvider {
@@ -9,6 +10,10 @@ export default class AppProvider {
 
     public async boot() {
         // IoC container is ready
+        const tmpPath = this.app.makePath('tmp');
+        if (!fs.existsSync(tmpPath)) {
+            fs.mkdirSync(tmpPath);
+        }
     }
 
     public async ready() {

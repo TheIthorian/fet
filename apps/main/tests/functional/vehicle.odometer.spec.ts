@@ -29,6 +29,7 @@ test.group('api/vehicles/odometer', (group) => {
             value: 100,
         });
 
+        response.assertStatus(401);
         response.assertBodyContains({
             errors: [{ message: 'E_UNAUTHORIZED_ACCESS: Unauthorized access' }],
         });
