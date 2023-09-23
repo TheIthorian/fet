@@ -20,19 +20,7 @@ export default class IntegrationApiKeysController {
         });
         Logger.info(`${ctx}`);
 
-        const apiKeys = await Database.query()
-            .from('integrations')
-            .select([
-                'integrations.name',
-                'user_integrations.api_key',
-                'user_integrations.created_at',
-                'user_integrations.updated_at',
-            ])
-            .leftJoin('user_integrations', (query) => {
-                query.on('user_integrations.integration_id', '=', 'integrations.id');
-                query.andOnVal('user_integrations.user_id', user.id);
-            })
-            .orderBy('integrations.name');
+        const apiKeys = await integrationApiKeyService.getIntegrationKeysForUser(user.id);
 
         response.json(apiKeys);
     }
