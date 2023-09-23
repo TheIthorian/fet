@@ -29,7 +29,7 @@ export default class ExceptionHandler extends HttpExceptionHandler {
             return super.handle({ message: 'unexpected server error', code: 'UNKNOWN' }, ctx);
         }
 
-        const { message, code } = error;
-        return super.handle({ message, code }, ctx);
+        delete error.stack;
+        return super.handle(error, ctx);
     }
 }
