@@ -25,10 +25,10 @@ test.group('api/location/:integrationName', (group) => {
         const integration = await Integration.findBy('name', 'owntracks');
         if (!integration) throw new Error('owntracks integration not found!');
 
-        apiKey = await new IntegrationApiKeyService().generateApiKeyForUser({
+        ({ apiKey } = await new IntegrationApiKeyService().generateApiKeyForUser({
             userId: user.id,
             integrationId: integration.id,
-        });
+        }));
     });
 
     test('POST api/location/:integrationName responds location and user', async ({ client }) => {
