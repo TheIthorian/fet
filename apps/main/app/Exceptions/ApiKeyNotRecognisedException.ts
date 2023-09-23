@@ -1,6 +1,6 @@
-import { Exception } from '@adonisjs/core/build/standalone';
+import { AppException } from './AppException';
 
-export default class ApiKeyNotRecognisedException extends Exception {
+export default class ApiKeyNotRecognisedException extends AppException {
     public static new(integrationName: string) {
         return new ApiKeyNotRecognisedException(
             `The api key provided for ${integrationName} is not recognised`,

@@ -1,6 +1,6 @@
-import { Exception } from '@adonisjs/core/build/standalone';
+import { AppException } from './AppException';
 
-export default class EmailAlreadyExistsException extends Exception {
+export default class EmailAlreadyExistsException extends AppException {
     public static new(email: string) {
         return new EmailAlreadyExistsException(
             `The email '${email}' already exists`,

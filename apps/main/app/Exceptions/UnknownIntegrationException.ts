@@ -1,6 +1,6 @@
-import { Exception } from '@adonisjs/core/build/standalone';
+import { AppException } from './AppException';
 
-export default class UnknownIntegrationException extends Exception {
+export default class UnknownIntegrationException extends AppException {
     public static new(name: string) {
         return new UnknownIntegrationException(
             `'${name}' is not a valid integration`,
