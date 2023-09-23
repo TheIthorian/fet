@@ -35,8 +35,7 @@ Route.post(
     'IntegrationApiKeysController.create'
 ).middleware('auth');
 
-Route.post('api/location/owntracks', 'OwntracksLocationController.handlePositionUpdate');
-Route.post('api/journey/:journeyId', 'JourneyController.updateDistance');
+Route.post('api/location/:integrationName', 'LocationController.handlePositionUpdate');
 
 Route.group(() => {
     Route.resource('me/config', 'UserConfigsController').apiOnly();
