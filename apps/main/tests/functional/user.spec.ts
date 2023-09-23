@@ -58,15 +58,10 @@ test.group('POST /register', (group) => {
 
         const response = await client.post('/register').json({ email, password });
 
-        response.assertStatus(422);
+        response.assertStatus(400);
         response.assertBody({
-            errors: [
-                {
-                    rule: 'unique',
-                    field: 'email',
-                    message: 'unique validation failure',
-                },
-            ],
+            message: `E_EMAIL_ALREADY_EXISTS: The email '${email}' already exists`,
+            code: 'E_EMAIL_ALREADY_EXISTS',
         });
     });
 });

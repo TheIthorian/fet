@@ -69,6 +69,7 @@ test.group('api/vehicles', (group) => {
 
         response.assertBodyContains({
             message: `E_VEHICLE_EXISTS: A vehicle with registration number ${vehicle.reg_no.toUpperCase()} has already been added`,
+            code: 'E_VEHICLE_EXISTS',
         });
     });
 
