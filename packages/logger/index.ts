@@ -18,7 +18,7 @@ export interface Logger {
     info: LogFunction;
     debug: LogFunction;
     trace: LogFunction;
-    silent: LogFunction;
+    silent?: LogFunction;
 }
 
 export function makeLogger(module: Module | undefined, level = DEFAULT_LEVEL): Logger {
