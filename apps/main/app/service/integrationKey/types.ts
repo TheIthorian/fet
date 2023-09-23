@@ -10,14 +10,13 @@ export type GenerateApiKeyForUserInput = {
     integrationId: number;
 };
 
-type IntegrationKeyForUser = {
+export type IntegrationKeyForUser = {
     name: string;
     api_key: string;
     created_at: Date;
     updated_at: Date;
+    webhook_url?: string;
 };
-
-export type GetIntegrationKeysForUserOutput = IntegrationKeyForUser[];
 
 export interface ApiKeyService {
     getUserIdByIntegrationKey({
@@ -25,7 +24,7 @@ export interface ApiKeyService {
         integrationName,
     }: GetUserIdByIntegrationKeyInput): Promise<number | undefined>;
 
-    getIntegrationKeysForUser(userId: number): Promise<GetIntegrationKeysForUserOutput>;
+    getIntegrationKeysForUser(userId: number): Promise<IntegrationKeyForUser[]>;
 
     generateApiKeyForUser({
         userId,

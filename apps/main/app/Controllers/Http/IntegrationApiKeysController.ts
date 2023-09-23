@@ -2,11 +2,12 @@ import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
 import Integration from 'App/Models/Integration';
 import UnknownIntegrationException from 'App/Exceptions/UnknownIntegrationException';
 import Logger from '@ioc:Adonis/Core/Logger';
-import Database from '@ioc:Adonis/Lucid/Database';
 import { logContext } from 'App/util/logger';
 import { IntegrationApiKeyService } from 'App/service/integrationKey';
 
 const integrationApiKeyService = new IntegrationApiKeyService();
+
+const host = '';
 
 export default class IntegrationApiKeysController {
     /**
@@ -21,6 +22,9 @@ export default class IntegrationApiKeysController {
         Logger.info(`${ctx}`);
 
         const apiKeys = await integrationApiKeyService.getIntegrationKeysForUser(user.id);
+        for (const keyData of apiKeys) {
+            keyData.webhook_url = `${host}/api/location/${keyData.name}?apiKey=${keyData.api_key}`;
+        }
 
         response.json(apiKeys);
     }
@@ -45,6 +49,7 @@ export default class IntegrationApiKeysController {
             name: integrationName,
             created_at: newRelation.createdAt,
             updated_at: newRelation.updatedAt,
+            url: `${host}/api/location/${integrationName}?apiKey=${newRelation.apiKey}`,
         });
     }
 }

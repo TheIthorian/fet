@@ -4,8 +4,8 @@ import UserIntegration from 'App/Models/UserIntegration';
 import {
     ApiKeyService,
     GenerateApiKeyForUserInput,
-    GetIntegrationKeysForUserOutput,
     GetUserIdByIntegrationKeyInput,
+    IntegrationKeyForUser,
 } from './types';
 import { logContext } from 'App/util/logger';
 import Database from '@ioc:Adonis/Lucid/Database';
@@ -36,9 +36,7 @@ export class IntegrationApiKeyService implements ApiKeyService {
         return userId;
     }
 
-    public async getIntegrationKeysForUser(
-        userId: number
-    ): Promise<GetIntegrationKeysForUserOutput> {
+    public async getIntegrationKeysForUser(userId: number): Promise<IntegrationKeyForUser[]> {
         return await Database.query()
             .from('integrations')
             .select([
