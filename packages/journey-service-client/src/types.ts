@@ -5,7 +5,7 @@ export interface Journey {
     startTime: Date;
     distance: number;
     userId: number;
-    lastPosition?: Coordinates;
+    lastLocation?: Coordinates;
     endTime?: Date;
     carId?: number;
 }

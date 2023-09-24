@@ -5,6 +5,8 @@ import {
     EndJourneyBodySchema,
     EndJourneyParamsSchema,
     GetJourneyParamsSchema,
+    PostLocationBodySchema,
+    PostLocationParamsSchema,
     UpdateDistanceBodySchema,
     UpdateDistanceParamsSchema,
 } from 'fet-journey-service-client';
@@ -16,6 +18,8 @@ import type {
     UpdateDistanceBodyInput,
     EndJourneyBodyInput,
     EndJourneyParamsInput,
+    PostLocationBodyInput,
+    PostLocationParamsInput,
 } from 'fet-journey-service-client';
 import { BodySchemaValidator, ParamSchemaValidator } from 'fet-object-schema';
 import type { ParsedBodyResponse, ParsedParamsResponse } from 'fet-object-schema';
@@ -42,6 +46,11 @@ export default function initJourneyRoutes(): Handler {
             ParamSchemaValidator(EndJourneyParamsSchema),
             BodySchemaValidator(EndJourneyBodySchema),
             postJourneyEndHandler,
+        ] as H)
+        .post('/location', [
+            ParamSchemaValidator(PostLocationParamsSchema),
+            BodySchemaValidator(PostLocationBodySchema),
+            postLocationHandler,
         ] as H);
 }
 
@@ -90,6 +99,26 @@ async function postJourneyEndHandler(
     const { userId, journeyId } = res.locals.parsedParams;
 
     const journey = await journeyApi.endJourney({ userId, carId, journeyId });
+
+    res.status(200);
+    res.json(journey);
+}
+
+async function postLocationHandler(
+    _: Request,
+    res: ParsedBodyResponse<PostLocationBodyInput> & ParsedParamsResponse<PostLocationParamsInput>
+): Promise<void> {
+    const { userId } = res.locals.parsedParams;
+    const { lat, lon, created_at, velocity, distance } = res.locals.parsedBody;
+
+    const journey = await journeyApi.postLocation({
+        userId,
+        lat,
+        lon,
+        created_at,
+        velocity,
+        distance,
+    });
 
     res.status(200);
     res.json(journey);

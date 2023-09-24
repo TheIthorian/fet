@@ -18,7 +18,7 @@ export const CreateJourneyParamSchema = UserParamsSchema;
 export type CreateJourneyInput = z.infer<typeof CreateJourneyParamSchema>;
 export type CreateJourneyOutput = { journey: Journey };
 
-// Position
+// Location
 export const UpdateDistanceParamsSchema = JourneyParamsSchema;
 export const CoordinatesSchema = z.object({
     lat: z.number().min(-90).max(90),
@@ -43,3 +43,17 @@ export type EndJourneyParamsInput = z.infer<typeof EndJourneyParamsSchema>;
 export type EndJourneyBodyInput = z.infer<typeof EndJourneyBodySchema>;
 export type EndJourneyInput = EndJourneyParamsInput & EndJourneyBodyInput;
 export type EndJourneyOutput = { journey: Journey };
+
+// Post location
+export const PostLocationParamsSchema = UserParamsSchema;
+export const PostLocationBodySchema = z.object({
+    lat: z.number().min(-90).max(90),
+    lon: z.number().min(-180).max(180),
+    created_at: z.string().optional(),
+    velocity: z.number().optional(),
+    distance: z.number().optional(),
+});
+export type PostLocationParamsInput = z.infer<typeof PostLocationParamsSchema>;
+export type PostLocationBodyInput = z.infer<typeof PostLocationBodySchema>;
+export type PostLocationInput = PostLocationParamsInput & PostLocationBodyInput;
+export type PostLocationOutput = { journey: Journey | null };

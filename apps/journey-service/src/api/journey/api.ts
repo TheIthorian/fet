@@ -10,12 +10,17 @@ import type {
     GetJourneyInput,
     GetJourneyOutput,
     Journey,
+    PostLocationInput,
+    PostLocationOutput,
     UpdateDistanceInput,
     UpdateDistanceOutput,
 } from 'fet-journey-service-client';
 import type { Database } from './database';
 
 const log = makeLogger(module);
+
+const MINIMUM_VELOCITY_TO_START_JOURNEY_IN_METERS_PER_SECOND = 7;
+const MAXIMUM_VELOCITY_TO_STOP_JOURNEY_IN_METERS_PER_SECOND = 1;
 
 export class JourneyApi {
     constructor(private readonly database: Database<Journey>) {}
@@ -72,6 +77,59 @@ export class JourneyApi {
         journey.carId = carId;
 
         return { journey };
+    }
+
+    async postLocation(input: PostLocationInput): Promise<PostLocationOutput> {
+        const { userId, velocity, lat, lon } = input;
+        const ctx = logContext(`${JourneyApi.name}.${this.postLocation.name}`, { userId }, log);
+
+        const existingJourney = await this.database.search('userId', userId);
+
+        if (!existingJourney) {
+            log.info(`${ctx} No existing journey found`);
+
+            // Create new journey
+            // TODO - handle case where velocity is undefined and so should take previous location to find it
+            if (velocity && velocity > MINIMUM_VELOCITY_TO_START_JOURNEY_IN_METERS_PER_SECOND) {
+                log.info(`${ctx} Creating new journey as velocity (${velocity}) is high enough`);
+                const { journey: newJourney } = await this.create({ userId });
+                newJourney.lastLocation = {
+                    lat: input.lat,
+                    long: input.lon,
+                };
+                await this.database.put(newJourney.id, newJourney);
+                return { journey: newJourney };
+            }
+
+            // User is not moving fast enough to consider a new journey
+            log.info(
+                `${ctx} Velocity (${
+                    velocity ?? 'undefined'
+                }) is not high enough to create new journey.`
+            );
+            return { journey: null };
+        }
+
+        // Already on an existing journey
+        log.info(`${ctx} Already on existing journey (${existingJourney.id})`);
+        if (velocity && velocity <= MAXIMUM_VELOCITY_TO_STOP_JOURNEY_IN_METERS_PER_SECOND) {
+            log.info(`${ctx} Velocity is ${velocity} below minimum. Handling stop`);
+            if (await isAtPetrolStation({ lat, long: lon })) {
+                log.info(`${ctx} stopped at petrol station. Ending journey`);
+                // Ping user
+                return this.endJourney({ journeyId: existingJourney.id, userId, carId: 1 }); // This needs to be in a complete state which can be updated later
+            }
+        }
+
+        // Continue journey
+        log.info(`${ctx} continuing journey`);
+        await this.updateDistance({
+            userId,
+            journeyId: existingJourney.id,
+            coordinates: { long: lon, lat },
+        });
+
+        return { journey: existingJourney };
     }
 }
 
