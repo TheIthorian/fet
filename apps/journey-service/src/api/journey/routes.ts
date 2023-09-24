@@ -28,14 +28,17 @@ export const journeyApi = new JourneyApi(database);
 type H = Handler[];
 export default function initJourneyRoutes(): Handler {
     return expressPromiseRouter({ mergeParams: true })
-        .get('/:journeyId', [ParamSchemaValidator(GetJourneyParamsSchema), getJourneyHandler] as H)
-        .post('/', [ParamSchemaValidator(CreateJourneyParamSchema), postJourneyHandler] as H)
-        .post('/:journeyId/position', [
+        .get('/journey/:journeyId', [
+            ParamSchemaValidator(GetJourneyParamsSchema),
+            getJourneyHandler,
+        ] as H)
+        .post('/journey', [ParamSchemaValidator(CreateJourneyParamSchema), postJourneyHandler] as H)
+        .post('/journey/:journeyId/location', [
             ParamSchemaValidator(UpdateDistanceParamsSchema),
             BodySchemaValidator(UpdateDistanceBodySchema),
-            postJourneyPositionHandler,
+            postJourneyLocationHandler,
         ] as H)
-        .post('/:journeyId/end', [
+        .post('/journey/:journeyId/end', [
             ParamSchemaValidator(EndJourneyParamsSchema),
             BodySchemaValidator(EndJourneyBodySchema),
             postJourneyEndHandler,
@@ -65,7 +68,7 @@ async function postJourneyHandler(
     res.json(journey);
 }
 
-async function postJourneyPositionHandler(
+async function postJourneyLocationHandler(
     _: Request,
     res: ParsedParamsResponse<UpdateDistanceParamsInput> &
         ParsedBodyResponse<UpdateDistanceBodyInput>
