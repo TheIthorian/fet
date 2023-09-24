@@ -21,7 +21,7 @@ describe('JourneyServiceClient', () => {
     });
 
     describe('happy path', () => {
-        it('should create a journey, update its position, and end it', async () => {
+        it('should create a journey, update its location, and end it', async () => {
             const { journey } = await jsClient.create({ userId });
             const journeyId = journey.id;
 
