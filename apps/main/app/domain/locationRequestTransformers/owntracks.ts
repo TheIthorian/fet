@@ -24,18 +24,35 @@ export class OwntracksTransformer implements LocationTransformer {
             throw ApiKeyNotRecognisedException.new(this.integrationName);
         }
 
+        console.log('request data:', request.body());
+
         const locationData = await request.validate({
             schema: schema.create({
                 lat: schema.number(),
                 lon: schema.number(),
+                tst: schema.number.optional(),
+                vel: schema.number.optional(),
             }),
         });
 
-        return { userId, ...locationData };
+        const data = {
+            userId,
+            lat: locationData.lat,
+            lon: locationData.lon,
+            created_at: locationData.tst
+                ? new Date(locationData.tst * 1000).toISOString()
+                : undefined,
+            velocity: locationData.vel,
+        };
+
+        console.log(data);
+
+        return data;
     }
 
     private getApiKeyFromRequest(request: RequestContract): string {
         const { apiKey } = request.qs();
+        console.log({ apiKey });
         return apiKey;
     }
 }

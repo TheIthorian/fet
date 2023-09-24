@@ -1,6 +1,13 @@
 import type { RequestContract } from '@ioc:Adonis/Core/Request';
 
-export type TransformOutput = { lat: number; lon: number; userId: number };
+export type TransformOutput = {
+    lat: number;
+    lon: number;
+    userId: number;
+    created_at?: string;
+    velocity?: number;
+    distance?: number;
+};
 
 export interface LocationTransformer {
     readonly integrationName: string;
