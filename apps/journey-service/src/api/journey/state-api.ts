@@ -15,7 +15,7 @@ const log = makeLogger(module);
 const MINIMUM_VELOCITY_TO_START_JOURNEY_IN_METERS_PER_SECOND = 7;
 const MAXIMUM_VELOCITY_TO_STOP_JOURNEY_IN_METERS_PER_SECOND = 1;
 
-const MINIMUM_STATIONARY_TIME_BEFORE_END_IN_MILLISECONDS = 3 * 60 * 1000; // 3 min
+const MINIMUM_STATIONARY_TIME_BEFORE_END_IN_MILLISECONDS = 1 * 60 * 1000; // 1 min
 
 export class JourneyStateApi {
     constructor(
@@ -85,7 +85,8 @@ export class JourneyStateApi {
                 ...activeJourney,
                 status: 'inProgress',
                 lastLocation: activeJourney.startLocation,
-                lastReadingDate: new Date(createdAtDate),
+                lastReadingDate: createdAtDate,
+                lastSignificantReadingDate: createdAtDate,
                 distance: newDistance,
             };
             await this.database.put(activeJourney.id, inProgressJourney);
@@ -97,12 +98,19 @@ export class JourneyStateApi {
         const actualDistance =
             distance ?? calculateDistanceChange(activeJourney.lastLocation, { lon, lat });
         const actualVelocity = velocity ?? (1000 * actualDistance) / timeSinceLastReading;
+        const lastSignificantReadingDate = activeJourney.lastSignificantReadingDate;
 
         log.info(`${ctx} Journey ${activeJourney.id} is in progress.`);
-        if (this.shouldStopJourney({ velocity: actualVelocity, timeSinceLastReading })) {
+        if (
+            this.shouldStopJourney({
+                velocity: actualVelocity,
+                timeSinceLastSignificantReading:
+                    createdAtDate.getTime() - lastSignificantReadingDate.getTime(),
+            })
+        ) {
             log.info(`Stopping journey ${activeJourney.id}.`, {
                 actualVelocity,
-                timeSinceLastReading,
+                lastSignificantReadingDate,
             });
             return this.stopJourney(activeJourney, createdAtDate);
         }
@@ -117,6 +125,10 @@ export class JourneyStateApi {
             ...activeJourney,
             lastLocation: { lat, lon },
             lastReadingDate: createdAtDate,
+            lastSignificantReadingDate:
+                actualVelocity < MAXIMUM_VELOCITY_TO_STOP_JOURNEY_IN_METERS_PER_SECOND
+                    ? activeJourney.lastSignificantReadingDate
+                    : createdAtDate,
             distance: newDistance,
         };
         await this.database.put(updatedJourney.id, updatedJourney);
@@ -184,18 +196,18 @@ export class JourneyStateApi {
 
     private shouldStopJourney({
         velocity,
-        timeSinceLastReading,
+        timeSinceLastSignificantReading,
     }: {
         velocity: number;
-        timeSinceLastReading: number;
+        timeSinceLastSignificantReading: number;
     }): boolean {
         logContext(
             `${JourneyStateApi.name}.${this.shouldStopJourney.name}`,
-            { velocity, timeSinceLastReading },
+            { velocity, timeSinceLastSignificantReading },
             log
         );
         return (
-            timeSinceLastReading > MINIMUM_STATIONARY_TIME_BEFORE_END_IN_MILLISECONDS &&
+            timeSinceLastSignificantReading > MINIMUM_STATIONARY_TIME_BEFORE_END_IN_MILLISECONDS &&
             (!velocity || velocity < MAXIMUM_VELOCITY_TO_STOP_JOURNEY_IN_METERS_PER_SECOND)
         );
     }

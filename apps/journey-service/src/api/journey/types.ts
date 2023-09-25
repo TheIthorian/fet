@@ -22,6 +22,7 @@ export interface InProgressJourney extends Journey {
     startLocation: Coordinates;
     lastLocation: Coordinates;
     lastReadingDate: Date;
+    lastSignificantReadingDate: Date;
     distance: number;
 }
 
