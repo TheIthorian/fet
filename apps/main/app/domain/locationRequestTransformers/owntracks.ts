@@ -41,7 +41,7 @@ export class OwntracksTransformer implements LocationTransformer {
             lon: locationData.lon,
             created_at: locationData.tst
                 ? new Date(locationData.tst * 1000).toISOString()
-                : undefined,
+                : new Date().toISOString(),
             velocity: locationData.vel,
         };
 

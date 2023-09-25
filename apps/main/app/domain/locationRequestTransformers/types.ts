@@ -4,7 +4,7 @@ export type TransformOutput = {
     lat: number;
     lon: number;
     userId: number;
-    created_at?: string;
+    created_at: string;
     velocity?: number;
     distance?: number;
 };

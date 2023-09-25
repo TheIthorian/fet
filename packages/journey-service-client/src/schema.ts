@@ -49,7 +49,7 @@ export const PostLocationParamsSchema = UserParamsSchema;
 export const PostLocationBodySchema = z.object({
     lat: z.number().min(-90).max(90),
     lon: z.number().min(-180).max(180),
-    created_at: z.string().optional(),
+    created_at: z.string(),
     velocity: z.number().optional(),
     distance: z.number().optional(),
 });
