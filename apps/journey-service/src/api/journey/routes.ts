@@ -25,9 +25,14 @@ import { BodySchemaValidator, ParamSchemaValidator } from 'fet-object-schema';
 import type { ParsedBodyResponse, ParsedParamsResponse } from 'fet-object-schema';
 import { JourneyApi } from './api';
 import { MemoryDatabase } from './database';
+import { JourneyStateApi } from './state-api';
+import type { CompletedJourney, InProgressJourney, NewJourney } from './types';
 
 export const database = new MemoryDatabase<Journey>();
 export const journeyApi = new JourneyApi(database);
+export const journeyStateApi = new JourneyStateApi(
+    new MemoryDatabase<NewJourney | InProgressJourney | CompletedJourney>()
+);
 
 type H = Handler[];
 export default function initJourneyRoutes(): Handler {
@@ -111,7 +116,7 @@ async function postLocationHandler(
     const { userId } = res.locals.parsedParams;
     const { lat, lon, created_at, velocity, distance } = res.locals.parsedBody;
 
-    const journey = await journeyApi.postLocation({
+    const journey = await journeyStateApi.handlePostLocation({
         userId,
         lat,
         lon,
@@ -121,5 +126,5 @@ async function postLocationHandler(
     });
 
     res.status(200);
-    res.json(journey);
+    res.json(journey ?? {});
 }
