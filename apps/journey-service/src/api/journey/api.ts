@@ -93,12 +93,12 @@ export class JourneyApi {
             if (velocity && velocity > MINIMUM_VELOCITY_TO_START_JOURNEY_IN_METERS_PER_SECOND) {
                 log.info(`${ctx} Creating new journey as velocity (${velocity}) is high enough`);
                 const { journey: newJourney } = await this.create({ userId });
-                newJourney.lastLocation = {
-                    lat: input.lat,
-                    long: input.lon,
-                };
-                await this.database.put(newJourney.id, newJourney);
-                return { journey: newJourney };
+                await this.updateDistance({
+                    journeyId: newJourney.id,
+                    userId,
+                    coordinates: { lat: input.lat, long: input.lon },
+                });
+                return this.get({ userId, journeyId: newJourney.id });
             }
 
             // User is not moving fast enough to consider a new journey
