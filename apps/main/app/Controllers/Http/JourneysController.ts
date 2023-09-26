@@ -1,9 +1,12 @@
+import Logger from '@ioc:Adonis/Core/Logger';
 import { schema } from '@ioc:Adonis/Core/Validator';
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
 import Journey from 'App/Models/Journey';
+import { logContext } from 'fet-logger';
 
 export default class JourneysController {
     public async create({ request, response }: HttpContextContract) {
+        const ctx = logContext(`${JourneysController.name}.${this.create.name}`, {}, Logger);
         const journeySchema = schema.create({
             id: schema.string({ trim: true }),
             userId: schema.number(),
@@ -33,6 +36,8 @@ export default class JourneysController {
             lastLocationLat: data.lastLocation.lat,
             lastLocationLon: data.lastLocation.lon,
         });
+
+        Logger.info(`${ctx} created  journey`, { id: data.id });
 
         response.json({});
     }
