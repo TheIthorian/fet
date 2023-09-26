@@ -23,6 +23,9 @@ import type {
 } from 'fet-journey-service-client';
 import { BodySchemaValidator, ParamSchemaValidator } from 'fet-object-schema';
 import type { ParsedBodyResponse, ParsedParamsResponse } from 'fet-object-schema';
+import { MicroserviceClient } from 'fet-http';
+import config from '../../config';
+import { JourneyLogService } from '../service/journey-log-service';
 import { JourneyApi } from './api';
 import { MemoryDatabase } from './database';
 import { JourneyStateApi } from './state-api';
@@ -30,8 +33,11 @@ import type { CompletedJourney, InProgressJourney, NewJourney } from './types';
 
 export const database = new MemoryDatabase<Journey>();
 export const journeyApi = new JourneyApi(database);
+
+const journeyLogMsClient = new MicroserviceClient(config.mainApp.url, config.mainApp.apiKey);
 export const journeyStateApi = new JourneyStateApi(
-    new MemoryDatabase<NewJourney | InProgressJourney | CompletedJourney>()
+    new MemoryDatabase<NewJourney | InProgressJourney | CompletedJourney>(),
+    new JourneyLogService(journeyLogMsClient)
 );
 
 type H = Handler[];

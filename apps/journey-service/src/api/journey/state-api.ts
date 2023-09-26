@@ -1,6 +1,7 @@
 import { ulid } from 'ulid';
 import { logContext, makeLogger } from 'fet-logger';
 import type { PostLocationInput } from 'fet-journey-service-client';
+import type { JourneyLogService } from '../service/journey-log-service';
 import type { Database } from './database';
 import type {
     CompletedJourney,
@@ -19,7 +20,8 @@ const MINIMUM_STATIONARY_TIME_BEFORE_END_IN_MILLISECONDS = 1 * 60 * 1000; // 1 m
 
 export class JourneyStateApi {
     constructor(
-        private readonly database: Database<NewJourney | InProgressJourney | CompletedJourney>
+        private readonly database: Database<NewJourney | InProgressJourney | CompletedJourney>,
+        private readonly journeyLogService: JourneyLogService
     ) {}
 
     public async handlePostLocation({
@@ -163,6 +165,7 @@ export class JourneyStateApi {
         return journey;
     }
 
+    // TODO - Save journey details
     public async stopJourney(journey: InProgressJourney, endTime: Date): Promise<CompletedJourney> {
         logContext(
             `${JourneyStateApi.name}.${this.stopJourney.name}`,
@@ -175,7 +178,10 @@ export class JourneyStateApi {
             status: 'completed',
             endTime,
         };
-        await this.database.put(completeJourney.id, completeJourney);
+        await this.database.pop(completeJourney.id);
+
+        await this.journeyLogService.saveCompletedJourney(completeJourney);
+
         return completeJourney;
     }
 
@@ -227,8 +233,6 @@ function calculateDistanceChange(
 function flatCalc(previousCoordinates: Coordinates, currentCoordinates: Coordinates): number {
     const earthRadius = 6371000; // Radius of the Earth in meters
 
-    console.log(currentCoordinates, previousCoordinates);
-
     // Calculate the differences in coordinates
     const latDiff = (currentCoordinates.lat - previousCoordinates.lat) * (Math.PI / 180);
     const lonDiff = (currentCoordinates.lon - previousCoordinates.lon) * (Math.PI / 180);
@@ -244,27 +248,30 @@ function flatCalc(previousCoordinates: Coordinates, currentCoordinates: Coordina
     return distance;
 }
 
-// function haversineCalc(previousCoordinates: Coordinates, currentCoordinates: Coordinates): number {
-//     const earthRadiusInMeters = 6371000;
+export function haversineCalc(
+    previousCoordinates: Coordinates,
+    currentCoordinates: Coordinates
+): number {
+    const earthRadiusInMeters = 6371000;
 
-//     // Convert latitude and longitude from degrees to radians
-//     const lat1Rad = (previousCoordinates.lat * Math.PI) / 180;
-//     const lon1Rad = (previousCoordinates.lon * Math.PI) / 180;
-//     const lat2Rad = (currentCoordinates.lat * Math.PI) / 180;
-//     const lon2Rad = (currentCoordinates.lon * Math.PI) / 180;
+    // Convert latitude and longitude from degrees to radians
+    const lat1Rad = (previousCoordinates.lat * Math.PI) / 180;
+    const lon1Rad = (previousCoordinates.lon * Math.PI) / 180;
+    const lat2Rad = (currentCoordinates.lat * Math.PI) / 180;
+    const lon2Rad = (currentCoordinates.lon * Math.PI) / 180;
 
-//     const latDiff = lat2Rad - lat1Rad;
-//     const lonDiff = lon2Rad - lon1Rad;
+    const latDiff = lat2Rad - lat1Rad;
+    const lonDiff = lon2Rad - lon1Rad;
 
-//     // Haversine formula
-//     const a =
-//         Math.sin(latDiff / 2) ** 2 +
-//         Math.cos(lat1Rad) * Math.cos(lat2Rad) * Math.sin(lonDiff / 2) ** 2;
-//     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    // Haversine formula
+    const a =
+        Math.sin(latDiff / 2) ** 2 +
+        Math.cos(lat1Rad) * Math.cos(lat2Rad) * Math.sin(lonDiff / 2) ** 2;
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
-//     const distance = earthRadiusInMeters * c;
-//     return distance;
-// }
+    const distance = earthRadiusInMeters * c;
+    return distance;
+}
 
 // function isAtPetrolStation({ lat, lon }: Coordinates): Promise<boolean> {
 //     log.info({ lat, lon });
