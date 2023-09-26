@@ -1,3 +1,4 @@
+import Env from '@ioc:Adonis/Core/Env';
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
 import Integration from 'App/Models/Integration';
 import UnknownIntegrationException from 'App/Exceptions/UnknownIntegrationException';
@@ -7,7 +8,7 @@ import { IntegrationApiKeyService } from 'App/service/integrationKey';
 
 const integrationApiKeyService = new IntegrationApiKeyService();
 
-const host = '';
+const proxyUrl = Env.get('PROXY_URL');
 
 export default class IntegrationApiKeysController {
     /**
@@ -23,7 +24,7 @@ export default class IntegrationApiKeysController {
 
         const apiKeys = await integrationApiKeyService.getIntegrationKeysForUser(user.id);
         for (const keyData of apiKeys) {
-            keyData.webhook_url = `${host}/api/location/${keyData.name}?apiKey=${keyData.api_key}`;
+            keyData.webhook_url = `${proxyUrl}/api/location/${keyData.name}?apiKey=${keyData.api_key}`;
         }
 
         response.json(apiKeys);
@@ -49,7 +50,7 @@ export default class IntegrationApiKeysController {
             name: integrationName,
             created_at: newRelation.createdAt,
             updated_at: newRelation.updatedAt,
-            url: `${host}/api/location/${integrationName}?apiKey=${newRelation.apiKey}`,
+            url: `${proxyUrl}/api/location/${integrationName}?apiKey=${newRelation.apiKey}`,
         });
     }
 }
