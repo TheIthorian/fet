@@ -180,7 +180,7 @@ export class JourneyStateApi {
         };
         await this.database.pop(completeJourney.id);
 
-        await this.journeyLogService.saveCompletedJourney(completeJourney);
+        void this.journeyLogService.saveCompletedJourney(completeJourney);
 
         return completeJourney;
     }

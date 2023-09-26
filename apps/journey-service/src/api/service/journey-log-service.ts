@@ -8,12 +8,21 @@ export class JourneyLogService {
     constructor(private readonly msClient: MicroserviceClient) {}
 
     public async saveCompletedJourney(completedJourney: CompletedJourney): Promise<void> {
-        log.info(`${logContext(`${JourneyLogService.name}.${this.saveCompletedJourney.name}`)}`, {
-            id: completedJourney.id,
-            lastLocation: completedJourney.lastLocation,
-        });
-        await this.msClient.post('/iapi/journey', {
-            body: completedJourney,
-        });
+        const ctx = logContext(
+            `${logContext(`${JourneyLogService.name}.${this.saveCompletedJourney.name}`)}`,
+            {
+                id: completedJourney.id,
+                ...completedJourney.lastLocation,
+            },
+            log
+        );
+
+        try {
+            await this.msClient.post('/iapi/journey', {
+                body: completedJourney,
+            });
+        } catch (error) {
+            log.error(`${ctx} Error posting completed journey`, error);
+        }
     }
 }

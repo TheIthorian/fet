@@ -46,4 +46,4 @@ Route.group(() => {
     .prefix('api')
     .middleware('auth');
 
-Route.post('iapi/journey', 'JourneysController.create');
+Route.post('iapi/journey', 'JourneysController.create').middleware('internal_auth');
