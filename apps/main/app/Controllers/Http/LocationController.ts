@@ -31,7 +31,7 @@ export default class LocationController {
 
         const { journey } = await journeyServiceClient.postLocation(location);
 
-        await fs.appendFile('./journeyLog', JSON.stringify(journey) + ',\n');
+        await fs.appendFile('./journeyLog.log', JSON.stringify(journey) + ',\n');
 
         response.status(201).json(location);
     }
