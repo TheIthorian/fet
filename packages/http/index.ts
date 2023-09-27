@@ -36,6 +36,12 @@ export class MicroserviceClient {
             headers['content-type'] = 'application/json';
         }
 
+        log.debug('calling service with: ', this.baseUrl + url, {
+            method,
+            headers,
+            body: requestBody,
+        });
+
         const response = await fetch(this.baseUrl + url, {
             method,
             headers,
