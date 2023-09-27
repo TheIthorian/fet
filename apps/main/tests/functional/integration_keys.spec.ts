@@ -39,6 +39,7 @@ test.group('api/me/integrations', (group) => {
                 api_key: null,
                 created_at: null,
                 updated_at: null,
+                webhook_url: 'http://127.0.0.1:3010/api/location/owntracks?apiKey=null',
             },
         ]);
     });
