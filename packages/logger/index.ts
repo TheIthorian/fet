@@ -32,7 +32,6 @@ export function makeLogger(module: Module | undefined, level = DEFAULT_LEVEL): L
         const modulePath = module.filename?.split('apps')[1]?.split('\\') ?? [];
         const lastPart = [modulePath[modulePath.length - 2], modulePath[modulePath.length - 1]];
         name = `${lastPart.join('/')}`;
-        console.log({ name });
     }
 
     return pino({ level, name }, pino.multistream(streams));
