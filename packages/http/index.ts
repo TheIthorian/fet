@@ -1,6 +1,7 @@
 import { HttpCalloutError } from 'fet-errors';
 import { makeLogger } from 'fet-logger';
 import { inspect } from 'util';
+import { fetch } from 'node-fetch-native';
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
 
@@ -68,7 +69,7 @@ export class MicroserviceClient {
     }
 }
 
-async function getBodyFromResponse(response: Response) {
+async function getBodyFromResponse(response: Awaited<ReturnType<typeof fetch>>) {
     const contentType = response.headers.get('content-type');
 
     if (contentType?.toLowerCase().includes('json')) {
