@@ -29,7 +29,11 @@ export default class LocationController {
         const location = await integrationTransformer.transform(request);
         Logger.info(`${ctx} location update found for user`);
 
-        const { journey } = await journeyServiceClient.postLocation(location);
+        const { journey } = await journeyServiceClient.postLocation(location).catch((err) => {
+            Logger.error('Error posting location to journey service');
+            Logger.error(err);
+            throw err;
+        });
 
         await fs.appendFile('./journeyLog.log', JSON.stringify(journey) + ',\n');
 
