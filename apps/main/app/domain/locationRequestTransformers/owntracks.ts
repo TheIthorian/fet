@@ -24,8 +24,6 @@ export class OwntracksTransformer implements LocationTransformer {
             throw ApiKeyNotRecognisedException.new(this.integrationName);
         }
 
-        console.log('request data:', request.body());
-
         const locationData = await request.validate({
             schema: schema.create({
                 lat: schema.number(),
