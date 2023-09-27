@@ -29,6 +29,7 @@
         "prettier": "^3.0.2",
         "prettier-config": "*",
         "typescript": "~4.6",
+        "undici": "^5.25.2",
         "youch": "^3.2.3",
         "youch-terminal": "^2.2.2"
     },
@@ -37,12 +38,12 @@
         "@adonisjs/core": "^5.9.0",
         "@adonisjs/lucid": "^18.4.0",
         "@adonisjs/repl": "^3.1.11",
+        "fet-journey-service-client": "*",
         "luxon": "^3.4.2",
         "pg": "^8.11.3",
         "proxy-addr": "^2.0.7",
         "reflect-metadata": "^0.1.13",
         "source-map-support": "^0.5.21",
-        "fet-journey-service-client": "*",
         "sqlite3": "^5.1.6"
     }
 }
