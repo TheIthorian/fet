@@ -86,7 +86,7 @@ export class JourneyStateApi {
             const inProgressJourney: InProgressJourney = {
                 ...activeJourney,
                 status: 'inProgress',
-                lastLocation: activeJourney.startLocation,
+                lastLocation: { lat, lon },
                 lastReadingDate: createdAtDate,
                 lastSignificantReadingDate: createdAtDate,
                 distance: newDistance,
@@ -159,6 +159,7 @@ export class JourneyStateApi {
             status: 'new',
             startTime,
             startLocation,
+            lastLocation: startLocation,
             distance: 0,
         };
         await this.database.put(journeyId, journey);

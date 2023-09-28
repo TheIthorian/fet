@@ -13,6 +13,7 @@ export interface NewJourney extends Journey {
     status: 'new';
     startTime: Date;
     startLocation: Coordinates;
+    lastLocation: Coordinates;
     distance: 0;
 }
 
