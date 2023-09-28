@@ -132,5 +132,5 @@ async function postLocationHandler(
     });
 
     res.status(200);
-    res.json(journey ?? {});
+    res.json(journey ? { journey } : {});
 }
