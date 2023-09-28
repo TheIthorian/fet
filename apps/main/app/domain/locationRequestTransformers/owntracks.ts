@@ -50,7 +50,9 @@ export class OwntracksTransformer implements LocationTransformer {
 
     private getApiKeyFromRequest(request: RequestContract): string {
         const { apiKey } = request.qs();
-        console.log({ apiKey });
+        Logger.info(
+            `${OwntracksTransformer.name}.${this.getApiKeyFromRequest.name} - apiKey: ${apiKey}`
+        );
         return apiKey;
     }
 }
