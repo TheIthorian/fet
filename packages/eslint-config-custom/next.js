@@ -39,6 +39,7 @@ module.exports = {
     rules: {
         'import/no-default-export': 'off',
         'prettier/prettier': ['error'],
+        'camelcase': 'off',
     },
     plugins: ['prettier', 'jest'],
     env: {

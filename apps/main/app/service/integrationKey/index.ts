@@ -1,8 +1,14 @@
 import crypto from 'node:crypto';
 import Logger from '@ioc:Adonis/Core/Logger';
 import UserIntegration from 'App/Models/UserIntegration';
-import { ApiKeyService, GenerateApiKeyForUserInput, GetUserIdByIntegrationKeyInput } from './types';
+import {
+    ApiKeyService,
+    GenerateApiKeyForUserInput,
+    GetUserIdByIntegrationKeyInput,
+    IntegrationKeyForUser,
+} from './types';
 import { logContext } from 'App/util/logger';
+import Database from '@ioc:Adonis/Lucid/Database';
 
 export * from './types';
 
@@ -28,6 +34,22 @@ export class IntegrationApiKeyService implements ApiKeyService {
         Logger.info(`${ctx} user id: ${userId ?? '(undefined)'}`);
 
         return userId;
+    }
+
+    public async getIntegrationKeysForUser(userId: number): Promise<IntegrationKeyForUser[]> {
+        return await Database.query()
+            .from('integrations')
+            .select([
+                'integrations.name',
+                'user_integrations.api_key',
+                'user_integrations.created_at',
+                'user_integrations.updated_at',
+            ])
+            .leftJoin('user_integrations', (query) => {
+                query.on('user_integrations.integration_id', '=', 'integrations.id');
+                query.andOnVal('user_integrations.user_id', userId);
+            })
+            .orderBy('integrations.name');
     }
 
     public async generateApiKeyForUser({

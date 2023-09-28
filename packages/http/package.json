@@ -9,7 +9,8 @@
         "tsconfig": "*"
     },
     "dependencies": {
+        "fet-errors": "*",
         "fet-logger": "*",
-        "fet-errors": "*"
+        "node-fetch-native": "^1.4.0"
     }
 }

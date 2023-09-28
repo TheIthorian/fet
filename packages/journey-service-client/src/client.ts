@@ -6,6 +6,8 @@ import {
     EndJourneyOutput,
     GetJourneyInput,
     GetJourneyOutput,
+    PostLocationInput,
+    PostLocationOutput,
     UpdateDistanceInput,
     UpdateDistanceOutput,
 } from './schema';
@@ -18,6 +20,8 @@ export interface IJourneyServiceClient {
     create(input: CreateJourneyInput): Promise<CreateJourneyOutput>;
     updateDistance(input: UpdateDistanceInput): Promise<UpdateDistanceOutput>;
     endJourney(input: EndJourneyInput): Promise<EndJourneyOutput>;
+
+    postLocation(input: PostLocationInput): Promise<PostLocationOutput>;
 }
 
 export function makeClient(baseUrl: string, apiKey: string): IJourneyServiceClient {
@@ -52,7 +56,7 @@ export class JourneyServiceClient implements IJourneyServiceClient {
         );
 
         return await this.microserviceClient.post(
-            `/api/users/${userId}/journey/${journeyId}/position`,
+            `/api/users/${userId}/journey/${journeyId}/location`,
             { body: { coordinates } }
         );
     }
@@ -67,6 +71,15 @@ export class JourneyServiceClient implements IJourneyServiceClient {
 
         return await this.microserviceClient.post(`/api/users/${userId}/journey/${journeyId}/end`, {
             body: { carId },
+        });
+    }
+
+    async postLocation(input: PostLocationInput): Promise<PostLocationOutput> {
+        const { userId } = input;
+        logContext(`${JourneyServiceClient.name}.${this.postLocation.name}`, { userId }, log);
+
+        return await this.microserviceClient.post(`/api/users/${userId}/location`, {
+            body: input,
         });
     }
 }

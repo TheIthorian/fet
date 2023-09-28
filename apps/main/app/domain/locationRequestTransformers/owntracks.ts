@@ -28,14 +28,29 @@ export class OwntracksTransformer implements LocationTransformer {
             schema: schema.create({
                 lat: schema.number(),
                 lon: schema.number(),
+                tst: schema.number.optional(),
+                vel: schema.number.optional(),
             }),
         });
 
-        return { userId, ...locationData };
+        const data = {
+            userId,
+            lat: locationData.lat,
+            lon: locationData.lon,
+            created_at: locationData.tst
+                ? new Date(locationData.tst * 1000).toISOString()
+                : new Date().toISOString(),
+            velocity: locationData.vel,
+        };
+
+        return data;
     }
 
     private getApiKeyFromRequest(request: RequestContract): string {
         const { apiKey } = request.qs();
+        Logger.info(
+            `${OwntracksTransformer.name}.${this.getApiKeyFromRequest.name} - apiKey: ${apiKey}`
+        );
         return apiKey;
     }
 }

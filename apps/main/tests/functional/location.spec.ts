@@ -1,3 +1,4 @@
+import Env from '@ioc:Adonis/Core/Env';
 import { faker } from '@faker-js/faker';
 import { test } from '@japa/runner';
 import Database from '@ioc:Adonis/Lucid/Database';
@@ -5,12 +6,21 @@ import User from 'App/Models/User';
 import UserFactory from 'Database/factories/UserFactory';
 import { IntegrationApiKeyService } from 'App/service/integrationKey';
 import Integration from 'App/Models/Integration';
+import { MockAgent, setGlobalDispatcher } from 'undici';
+
+const journeyServiceUrl = Env.get('JOURNEY_SERVICE_URL');
+const journeyServiceApiKey = Env.get('JOURNEY_SERVICE_API_KEY');
 
 test.group('api/location/:integrationName', (group) => {
     let user: User;
     let apiKey: string;
     const lon = faker.number.float({ min: -180, max: 180 });
     const lat = faker.number.float({ min: -90, max: 90 });
+
+    const jsMockAgent = new MockAgent();
+    const jsMockDispatcher = jsMockAgent.get(journeyServiceUrl);
+    setGlobalDispatcher(jsMockDispatcher);
+    jsMockAgent.disableNetConnect();
 
     group.each.setup(async () => {
         await Database.beginGlobalTransaction();
@@ -31,16 +41,44 @@ test.group('api/location/:integrationName', (group) => {
         }));
     });
 
-    test('POST api/location/:integrationName responds location and user', async ({ client }) => {
+    test('POST api/location/:integrationName responds with location and user', async ({
+        client,
+    }) => {
+        const tst = 1695838770;
+        const readingTime = new Date(tst * 1000);
+
+        console.log('mocking', `${journeyServiceUrl}/api`, ` /users/${user.id}/location`);
+
+        jsMockDispatcher
+            .intercept({
+                path: `/api/users/${user.id}/location`,
+                headers: { Authorization: 'apikey ' + journeyServiceApiKey },
+                method: 'POST',
+            })
+            .reply(201, {
+                journey: {
+                    id: 'id',
+                    startTime: readingTime,
+                    distance: 0,
+                    userId: user.id,
+                    lastLocation: {
+                        lon,
+                        lat,
+                    },
+                },
+            });
+
         const response = await client
             .post(`api/location/owntracks?apiKey=${apiKey}`)
-            .json({ lon, lat });
+            .json({ lon, lat, tst, vel: 10 });
 
         response.assertBodyContains({
             userId: user.id,
             lon,
             lat,
         });
+
+        jsMockAgent.assertNoPendingInterceptors();
     });
 
     test('POST api/location/:integrationName responds with error when integration name is invalid', async ({

@@ -35,7 +35,7 @@ Route.post(
     'IntegrationApiKeysController.create'
 ).middleware('auth');
 
-Route.post('api/location/:integrationName', 'LocationController.handlePositionUpdate');
+Route.post('api/location/:integrationName', 'LocationController.handleLocationUpdate');
 
 Route.group(() => {
     Route.resource('me/config', 'UserConfigsController').apiOnly();
@@ -45,3 +45,5 @@ Route.group(() => {
 })
     .prefix('api')
     .middleware('auth');
+
+Route.post('iapi/journey', 'JourneysController.create').middleware('internal_auth');

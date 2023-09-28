@@ -1,12 +1,14 @@
+import Env from '@ioc:Adonis/Core/Env';
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
 import Integration from 'App/Models/Integration';
 import UnknownIntegrationException from 'App/Exceptions/UnknownIntegrationException';
 import Logger from '@ioc:Adonis/Core/Logger';
-import Database from '@ioc:Adonis/Lucid/Database';
 import { logContext } from 'App/util/logger';
 import { IntegrationApiKeyService } from 'App/service/integrationKey';
 
 const integrationApiKeyService = new IntegrationApiKeyService();
+
+const proxyUrl = Env.get('PROXY_URL');
 
 export default class IntegrationApiKeysController {
     /**
@@ -20,19 +22,10 @@ export default class IntegrationApiKeysController {
         });
         Logger.info(`${ctx}`);
 
-        const apiKeys = await Database.query()
-            .from('integrations')
-            .select([
-                'integrations.name',
-                'user_integrations.api_key',
-                'user_integrations.created_at',
-                'user_integrations.updated_at',
-            ])
-            .leftJoin('user_integrations', (query) => {
-                query.on('user_integrations.integration_id', '=', 'integrations.id');
-                query.andOnVal('user_integrations.user_id', user.id);
-            })
-            .orderBy('integrations.name');
+        const apiKeys = await integrationApiKeyService.getIntegrationKeysForUser(user.id);
+        for (const keyData of apiKeys) {
+            keyData.webhook_url = `${proxyUrl}/api/location/${keyData.name}?apiKey=${keyData.api_key}`;
+        }
 
         response.json(apiKeys);
     }
@@ -57,6 +50,7 @@ export default class IntegrationApiKeysController {
             name: integrationName,
             created_at: newRelation.createdAt,
             updated_at: newRelation.updatedAt,
+            url: `${proxyUrl}/api/location/${integrationName}?apiKey=${newRelation.apiKey}`,
         });
     }
 }

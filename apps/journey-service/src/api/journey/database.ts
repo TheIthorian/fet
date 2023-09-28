@@ -4,6 +4,7 @@ export interface Database<T extends object> {
     get: (id: string) => Promise<T | null>;
     put: (id: string, value: T) => Promise<void>;
     pop: (id: string) => Promise<T | null>;
+    search: (property: keyof T, value: ValueOf<T, keyof T>) => Promise<T | undefined>;
 }
 
 export class MemoryDatabase<T extends object> implements Database<T> {
@@ -27,4 +28,19 @@ export class MemoryDatabase<T extends object> implements Database<T> {
 
         return journey;
     }
+
+    async search(property: keyof T, value: ValueOf<T, keyof T>): Promise<T | undefined> {
+        await setTimeout();
+
+        const allRecords = this.storage.values();
+        let foundRecord: T | undefined;
+        for (const record of allRecords) {
+            if (record[property] === value) {
+                foundRecord = record;
+            }
+        }
+        return foundRecord;
+    }
 }
+
+type ValueOf<T, K extends keyof T> = T[K];

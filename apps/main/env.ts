@@ -24,4 +24,7 @@ export default Env.rules({
 
     JOURNEY_SERVICE_URL: Env.schema.string({ format: 'url' }),
     JOURNEY_SERVICE_API_KEY: Env.schema.string(),
+
+    PROXY_URL: Env.schema.string({ format: 'url' }),
+    INTERNAL_KEY: Env.schema.string(),
 });

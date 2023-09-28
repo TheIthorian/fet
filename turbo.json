@@ -8,7 +8,9 @@
         "JOURNEY_SERVICE_HOST",
         "JOURNEY_SERVICE_PORT",
         "JOURNEY_SERVICE_NODE_ENV",
-        "JOURNEY_SERVICE_API_KEY"
+        "JOURNEY_SERVICE_API_KEY",
+        "MAIN_APP_URL",
+        "MAIN_APP_INTERNAL_KEY"
     ],
     "pipeline": {
         "build": {

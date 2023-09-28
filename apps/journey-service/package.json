@@ -39,6 +39,7 @@
         "fet-object-schema": "*",
         "fet-journey-service-client": "*",
         "fet-logger": "*",
+        "fet-http": "*",
         "tsconfig": "*",
         "ulid": "^2.3.0",
         "zod": "^3.22.2"
