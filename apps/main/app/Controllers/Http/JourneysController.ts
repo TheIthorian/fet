@@ -25,7 +25,7 @@ export default class JourneysController {
 
         const data = await request.validate({ schema: journeySchema });
 
-        await Journey.create({
+        const journey = await Journey.create({
             id: data.id,
             userId: data.userId,
             startTime: data.startTime,
@@ -37,8 +37,8 @@ export default class JourneysController {
             lastLocationLon: data.lastLocation.lon,
         });
 
-        Logger.info(`${ctx} created  journey`, { id: data.id });
+        Logger.info(`${ctx} created  journey`, { id: journey.id });
 
-        response.json({});
+        response.json(journey);
     }
 }

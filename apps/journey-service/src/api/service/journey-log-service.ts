@@ -18,9 +18,10 @@ export class JourneyLogService {
         );
 
         try {
-            await this.msClient.post('/iapi/journey', {
+            const savedJourney = await this.msClient.post<CompletedJourney>('/iapi/journey', {
                 body: completedJourney,
             });
+            log.info(`${ctx} - saved journey ${savedJourney.id}`);
         } catch (error) {
             log.error(`${ctx} Error posting completed journey`, error);
         }
