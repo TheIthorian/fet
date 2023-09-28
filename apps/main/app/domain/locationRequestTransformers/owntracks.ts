@@ -43,8 +43,6 @@ export class OwntracksTransformer implements LocationTransformer {
             velocity: locationData.vel,
         };
 
-        console.log(data);
-
         return data;
     }
 
