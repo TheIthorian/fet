@@ -28,7 +28,7 @@ describe('Journey', () => {
             for (const { url } of [
                 { url: `/api/users/${userId}/journey/${journey.id}` },
                 { url: `/api/users/${userId}/journey` },
-                { url: `/api/users/${userId}/journey/${journey.id}/position` },
+                { url: `/api/users/${userId}/journey/${journey.id}/location` },
                 { url: `/api/users/${userId}/journey/${journey.id}/end` },
             ]) {
                 // eslint-disable-next-line no-await-in-loop
@@ -116,7 +116,7 @@ describe('Journey', () => {
         });
     });
 
-    describe('/api/users/:userId/journey/:journeyId/position (POST)', () => {
+    describe('/api/users/:userId/journey/:journeyId/location (POST)', () => {
         let journey;
 
         beforeEach(async () => {
@@ -125,28 +125,28 @@ describe('Journey', () => {
 
         it('updates the journey distance when new coordinates are provided', async () => {
             const res = await stAgent
-                .post(`/api/users/${userId}/journey/${journey.id}/position`)
+                .post(`/api/users/${userId}/journey/${journey.id}/location`)
                 .send({ coordinates: { lat: 51.50134811258048, long: -0.14189287996502006 } })
                 .set({ Authorization: apiKey })
                 .expect(200);
 
             const distance = res.body.distance;
-            expect(distance).toBe(1);
+            expect(distance).toBe(0);
 
             const res2 = await stAgent
-                .post(`/api/users/${userId}/journey/${journey.id}/position`)
+                .post(`/api/users/${userId}/journey/${journey.id}/location`)
                 .send({ coordinates: { lat: 51.50072031422008, long: -0.1246355475257489 } })
                 .set({ Authorization: apiKey })
                 .expect(200);
 
             const distance2 = res2.body.distance;
-            expect(distance2).toBe(2);
+            expect(distance2).toBe(1196.5715756853294);
         });
 
         it('returns 404 error when the journey is not found', async () => {
             const invalidId = ulid();
             await stAgent
-                .post(`/api/users/${userId}/journey/${invalidId}/position`)
+                .post(`/api/users/${userId}/journey/${invalidId}/location`)
                 .send({ coordinates: { lat: 51.50134811258048, long: -0.14189287996502006 } })
                 .set({ Authorization: apiKey })
                 .expect(404)

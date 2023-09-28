@@ -39,7 +39,17 @@ describe('JourneyServiceClient', () => {
                     long: -0.14189287996502006,
                 },
             });
-            expect(newDistance).toEqual(1); // TODO - update this
+            expect(newDistance).toEqual(0);
+
+            const { distance: updatedDistance } = await jsClient.updateDistance({
+                userId,
+                journeyId,
+                coordinates: {
+                    lat: 51.50072027335213,
+                    long: -0.12463557010122289,
+                },
+            });
+            expect(updatedDistance).toEqual(1196.570281356086);
 
             const { journey: finalJourney } = await jsClient.endJourney({
                 userId,

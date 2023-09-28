@@ -41,24 +41,19 @@ test.group('api/location/:integrationName', (group) => {
         }));
     });
 
-    test('POST api/location/:integrationName responds location and user', async ({
+    test('POST api/location/:integrationName responds with location and user', async ({
         client,
-        assert,
     }) => {
         const tst = 1695838770;
         const readingTime = new Date(tst * 1000);
 
         console.log('mocking', `${journeyServiceUrl}/api`, ` /users/${user.id}/location`);
 
-        let body: string;
         jsMockDispatcher
             .intercept({
                 path: `/api/users/${user.id}/location`,
+                headers: { Authorization: 'apikey ' + journeyServiceApiKey },
                 method: 'POST',
-                body: (b) => {
-                    body = b;
-                    return true;
-                },
             })
             .reply(201, {
                 journey: {
@@ -82,19 +77,6 @@ test.group('api/location/:integrationName', (group) => {
             lon,
             lat,
         });
-
-        for await (const b of body) {
-            assert.assert(
-                b.toString(),
-                JSON.stringify({
-                    userId: user.id,
-                    lat,
-                    lon,
-                    created_at: readingTime.toISOString(),
-                    velocity: 10,
-                })
-            );
-        }
 
         jsMockAgent.assertNoPendingInterceptors();
     });
