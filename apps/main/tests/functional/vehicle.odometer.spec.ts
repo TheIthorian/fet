@@ -15,9 +15,7 @@ test.group('api/vehicles/odometer', (group) => {
     });
 
     group.each.setup(async () => {
-        user = await User.create(
-            await UserFactory.merge({ email: 'vehicle.odometer.spec@test.com' }).create()
-        );
+        user = await User.create(await UserFactory.merge({ email: 'vehicle.odometer.spec@test.com' }).create());
 
         vehicle = await Vehicle.create(await VehicleFactory.merge({ userId: user.id }).create());
     });

@@ -19,15 +19,9 @@ export type IntegrationKeyForUser = {
 };
 
 export interface ApiKeyService {
-    getUserIdByIntegrationKey({
-        apiKey,
-        integrationName,
-    }: GetUserIdByIntegrationKeyInput): Promise<number | undefined>;
+    getUserIdByIntegrationKey({ apiKey, integrationName }: GetUserIdByIntegrationKeyInput): Promise<number | undefined>;
 
     getIntegrationKeysForUser(userId: number): Promise<IntegrationKeyForUser[]>;
 
-    generateApiKeyForUser({
-        userId,
-        integrationId,
-    }: GenerateApiKeyForUserInput): Promise<UserIntegration>;
+    generateApiKeyForUser({ userId, integrationId }: GenerateApiKeyForUserInput): Promise<UserIntegration>;
 }

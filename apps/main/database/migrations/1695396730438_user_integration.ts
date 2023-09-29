@@ -8,13 +8,7 @@ export default class extends BaseSchema {
             table.increments('id');
             table.integer('user_id').references('id').inTable('users').notNullable().index();
             table.string('api_key').unique().index();
-            table
-                .string('integration_id')
-                .notNullable()
-                .references('id')
-                .inTable('integrations')
-                .notNullable()
-                .index();
+            table.string('integration_id').notNullable().references('id').inTable('integrations').notNullable().index();
 
             /**
              * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL

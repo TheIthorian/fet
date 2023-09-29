@@ -55,10 +55,7 @@ export class JourneyApi {
         const { userId, coordinates, journeyId } = input;
         const { journey: existingJourney } = await this.get({ userId, journeyId });
 
-        existingJourney.distance += calculateDistanceChange(
-            existingJourney.lastLocation ?? coordinates,
-            coordinates
-        );
+        existingJourney.distance += calculateDistanceChange(existingJourney.lastLocation ?? coordinates, coordinates);
         existingJourney.lastLocation = coordinates;
 
         await this.database.put(journeyId, existingJourney);
@@ -102,11 +99,7 @@ export class JourneyApi {
             }
 
             // User is not moving fast enough to consider a new journey
-            log.info(
-                `${ctx} Velocity (${
-                    velocity ?? 'undefined'
-                }) is not high enough to create new journey.`
-            );
+            log.info(`${ctx} Velocity (${velocity ?? 'undefined'}) is not high enough to create new journey.`);
             return { journey: null };
         }
 
@@ -133,10 +126,7 @@ export class JourneyApi {
     }
 }
 
-function calculateDistanceChange(
-    previousCoordinates: Coordinates,
-    currentCoordinates: Coordinates
-): number {
+function calculateDistanceChange(previousCoordinates: Coordinates, currentCoordinates: Coordinates): number {
     const earthRadiusInMeters = 6371000;
 
     // Convert latitude and longitude from degrees to radians
@@ -149,9 +139,7 @@ function calculateDistanceChange(
     const lonDiff = lon2Rad - lon1Rad;
 
     // Haversine formula
-    const a =
-        Math.sin(latDiff / 2) ** 2 +
-        Math.cos(lat1Rad) * Math.cos(lat2Rad) * Math.sin(lonDiff / 2) ** 2;
+    const a = Math.sin(latDiff / 2) ** 2 + Math.cos(lat1Rad) * Math.cos(lat2Rad) * Math.sin(lonDiff / 2) ** 2;
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
     const distance = earthRadiusInMeters * c;

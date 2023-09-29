@@ -17,9 +17,7 @@ setImmediate(() => {
     const port = config.port;
     const host = config.host;
     server.listen(port, host, () => {
-        log.info(
-            `App listening on http://${config.host}:${port} in ${app.get('env') as string} mode`
-        );
+        log.info(`App listening on http://${config.host}:${port} in ${app.get('env') as string} mode`);
 
         log.info(`Current working directory: ${process.cwd()}`);
     });

@@ -20,15 +20,10 @@ export class MicroserviceClient {
         public readonly baseUrl: string,
         public readonly apiKey: string
     ) {
-        log.info(
-            `Created MicroserviceClient using url: ${this.baseUrl} with apiKey: ${this.apiKey}`
-        );
+        log.info(`Created MicroserviceClient using url: ${this.baseUrl} with apiKey: ${this.apiKey}`);
     }
 
-    async call<T>(
-        url: string,
-        { method = 'GET', headers = {}, body = {} }: CallOptions = {}
-    ): Promise<T> {
+    async call<T>(url: string, { method = 'GET', headers = {}, body = {} }: CallOptions = {}): Promise<T> {
         headers = { ...DEFAULT_HEADERS, ...headers, Authorization: `apikey ${this.apiKey}` };
 
         const requestBody = body && JSON.stringify(body);

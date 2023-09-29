@@ -8,10 +8,7 @@ export default class VehiclesController {
     public async index({ response, auth }: HttpContextContract) {
         const user = await auth.use('api').authenticate();
 
-        const vehicles = await Vehicle.query()
-            .select('*')
-            .where('user_id', user.id)
-            .orderBy('created_at');
+        const vehicles = await Vehicle.query().select('*').where('user_id', user.id).orderBy('created_at');
 
         response.json(vehicles);
     }

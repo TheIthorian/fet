@@ -3,13 +3,7 @@ import { logContext, makeLogger } from 'fet-logger';
 import type { PostLocationInput } from 'fet-journey-service-client';
 import type { JourneyLogService } from '../service/journey-log-service';
 import type { Database } from './database';
-import type {
-    CompletedJourney,
-    Coordinates,
-    InProgressJourney,
-    Journey,
-    NewJourney,
-} from './types';
+import type { CompletedJourney, Coordinates, InProgressJourney, Journey, NewJourney } from './types';
 
 const log = makeLogger(module);
 
@@ -46,11 +40,7 @@ export class JourneyStateApi {
             log.info(`${ctx} No active journey found`);
 
             if (this.shouldStartNewJourney({ velocity, lat, lon })) {
-                log.info(
-                    `${ctx} Velocity (${
-                        velocity ?? 'undefined'
-                    }) high enough to start a new journey`
-                );
+                log.info(`${ctx} Velocity (${velocity ?? 'undefined'}) high enough to start a new journey`);
 
                 return this.startNewJourney({
                     userId,
@@ -60,11 +50,7 @@ export class JourneyStateApi {
             }
 
             // Ignore. Velocity not high enough
-            log.info(
-                `${ctx} Velocity (${
-                    velocity ?? 'undefined'
-                }) not high enough to start a new journey`
-            );
+            log.info(`${ctx} Velocity (${velocity ?? 'undefined'}) not high enough to start a new journey`);
             return;
         }
 
@@ -75,13 +61,10 @@ export class JourneyStateApi {
         }
 
         if (activeJourney.status === 'new') {
-            const delta =
-                distance ?? calculateDistanceChange(activeJourney.startLocation, { lat, lon });
+            const delta = distance ?? calculateDistanceChange(activeJourney.startLocation, { lat, lon });
             const newDistance = activeJourney.distance + delta;
 
-            log.info(
-                `${ctx} Journey ${activeJourney.id} is new. Setting distance to ${newDistance}`
-            );
+            log.info(`${ctx} Journey ${activeJourney.id} is new. Setting distance to ${newDistance}`);
 
             const inProgressJourney: InProgressJourney = {
                 ...activeJourney,
@@ -97,8 +80,7 @@ export class JourneyStateApi {
 
         const timeSinceLastReading =
             new Date(createdAtDate).getTime() - new Date(activeJourney.lastReadingDate).getTime();
-        const actualDistance =
-            distance ?? calculateDistanceChange(activeJourney.lastLocation, { lon, lat });
+        const actualDistance = distance ?? calculateDistanceChange(activeJourney.lastLocation, { lon, lat });
         const actualVelocity = velocity ?? (1000 * actualDistance) / timeSinceLastReading;
         const lastSignificantReadingDate = activeJourney.lastSignificantReadingDate;
 
@@ -106,8 +88,7 @@ export class JourneyStateApi {
         if (
             this.shouldStopJourney({
                 velocity: actualVelocity,
-                timeSinceLastSignificantReading:
-                    createdAtDate.getTime() - lastSignificantReadingDate.getTime(),
+                timeSinceLastSignificantReading: createdAtDate.getTime() - lastSignificantReadingDate.getTime(),
             })
         ) {
             log.info(`Stopping journey ${activeJourney.id}.`, {
@@ -147,11 +128,7 @@ export class JourneyStateApi {
         startLocation: Coordinates;
     }): Promise<NewJourney> {
         const journeyId = ulid();
-        logContext(
-            `${JourneyStateApi.name}.${this.startNewJourney.name}`,
-            { journeyId, userId, startTime },
-            log
-        );
+        logContext(`${JourneyStateApi.name}.${this.startNewJourney.name}`, { journeyId, userId, startTime }, log);
 
         const journey: NewJourney = {
             id: journeyId,
@@ -168,11 +145,7 @@ export class JourneyStateApi {
 
     // TODO - Save journey details
     public async stopJourney(journey: InProgressJourney, endTime: Date): Promise<CompletedJourney> {
-        logContext(
-            `${JourneyStateApi.name}.${this.stopJourney.name}`,
-            { journeyId: journey.id, endTime },
-            log
-        );
+        logContext(`${JourneyStateApi.name}.${this.stopJourney.name}`, { journeyId: journey.id, endTime }, log);
 
         const completeJourney: CompletedJourney = {
             ...journey,
@@ -186,19 +159,9 @@ export class JourneyStateApi {
         return completeJourney;
     }
 
-    private shouldStartNewJourney({
-        velocity,
-        lat,
-        lon,
-    }: {
-        velocity?: number;
-        lat: number;
-        lon: number;
-    }): boolean {
+    private shouldStartNewJourney({ velocity, lat, lon }: { velocity?: number; lat: number; lon: number }): boolean {
         logContext(`${JourneyStateApi.name}.${this.shouldStartNewJourney.name}`, { lat, lon }, log);
-        return Boolean(
-            velocity && velocity > MINIMUM_VELOCITY_TO_START_JOURNEY_IN_METERS_PER_SECOND
-        );
+        return Boolean(velocity && velocity > MINIMUM_VELOCITY_TO_START_JOURNEY_IN_METERS_PER_SECOND);
     }
 
     private shouldStopJourney({
@@ -220,10 +183,7 @@ export class JourneyStateApi {
     }
 }
 
-function calculateDistanceChange(
-    previousCoordinates: Coordinates,
-    currentCoordinates: Coordinates
-): number {
+function calculateDistanceChange(previousCoordinates: Coordinates, currentCoordinates: Coordinates): number {
     const distance = flatCalc(previousCoordinates, currentCoordinates);
 
     log.info(`${calculateDistanceChange.name} distance ${distance}`); // Calculate
@@ -249,10 +209,7 @@ function flatCalc(previousCoordinates: Coordinates, currentCoordinates: Coordina
     return distance;
 }
 
-export function haversineCalc(
-    previousCoordinates: Coordinates,
-    currentCoordinates: Coordinates
-): number {
+export function haversineCalc(previousCoordinates: Coordinates, currentCoordinates: Coordinates): number {
     const earthRadiusInMeters = 6371000;
 
     // Convert latitude and longitude from degrees to radians
@@ -265,9 +222,7 @@ export function haversineCalc(
     const lonDiff = lon2Rad - lon1Rad;
 
     // Haversine formula
-    const a =
-        Math.sin(latDiff / 2) ** 2 +
-        Math.cos(lat1Rad) * Math.cos(lat2Rad) * Math.sin(lonDiff / 2) ** 2;
+    const a = Math.sin(latDiff / 2) ** 2 + Math.cos(lat1Rad) * Math.cos(lat2Rad) * Math.sin(lonDiff / 2) ** 2;
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
     const distance = earthRadiusInMeters * c;

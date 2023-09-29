@@ -14,14 +14,10 @@ test.group('api/me/integrations', (group) => {
     });
 
     group.each.setup(async () => {
-        user = await User.create(
-            await UserFactory.merge({ email: 'integration_keys.spec@test.com' }).create()
-        );
+        user = await User.create(await UserFactory.merge({ email: 'integration_keys.spec@test.com' }).create());
     });
 
-    test('GET api/me/integrations responds with auth error when no token is provided', async ({
-        client,
-    }) => {
+    test('GET api/me/integrations responds with auth error when no token is provided', async ({ client }) => {
         const response = await client.get('api/me/integrations');
 
         response.assertStatus(401);
@@ -44,9 +40,7 @@ test.group('api/me/integrations', (group) => {
         ]);
     });
 
-    test('GET api/me/integrations responds with all integrations with populated api key', async ({
-        client,
-    }) => {
+    test('GET api/me/integrations responds with all integrations with populated api key', async ({ client }) => {
         const integration = await Integration.findBy('name', 'owntracks');
         if (!integration) throw new Error('owntracks integration not found!');
 
@@ -80,10 +74,7 @@ test.group('api/me/integrations', (group) => {
     test('POST api/me/integrations/:integrationName creates an api key for the given integration', async ({
         client,
     }) => {
-        const response = await client
-            .post('api/me/integrations/owntracks')
-            .guard('api')
-            .loginAs(user);
+        const response = await client.post('api/me/integrations/owntracks').guard('api').loginAs(user);
 
         response.assertStatus(201);
         response.assertBodyContains({
@@ -97,10 +88,7 @@ test.group('api/me/integrations', (group) => {
     test('POST api/me/integrations/:integrationName responds with error when the given integration is invalid', async ({
         client,
     }) => {
-        const response = await client
-            .post('api/me/integrations/invalid_integration')
-            .guard('api')
-            .loginAs(user);
+        const response = await client.post('api/me/integrations/invalid_integration').guard('api').loginAs(user);
 
         response.assertStatus(400);
         response.assertBodyContains({

@@ -37,9 +37,7 @@ export class OwntracksTransformer implements LocationTransformer {
             userId,
             lat: locationData.lat,
             lon: locationData.lon,
-            created_at: locationData.tst
-                ? new Date(locationData.tst * 1000).toISOString()
-                : new Date().toISOString(),
+            created_at: locationData.tst ? new Date(locationData.tst * 1000).toISOString() : new Date().toISOString(),
             velocity: locationData.vel,
         };
 
@@ -48,9 +46,7 @@ export class OwntracksTransformer implements LocationTransformer {
 
     private getApiKeyFromRequest(request: RequestContract): string {
         const { apiKey } = request.qs();
-        Logger.info(
-            `${OwntracksTransformer.name}.${this.getApiKeyFromRequest.name} - apiKey: ${apiKey}`
-        );
+        Logger.info(`${OwntracksTransformer.name}.${this.getApiKeyFromRequest.name} - apiKey: ${apiKey}`);
         return apiKey;
     }
 }

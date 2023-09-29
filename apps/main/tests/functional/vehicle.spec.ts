@@ -15,9 +15,7 @@ test.group('api/vehicles', (group) => {
     });
 
     group.each.setup(async () => {
-        user = await User.create(
-            await UserFactory.merge({ email: 'vehicle.odometer.spec@test.com' }).create()
-        );
+        user = await User.create(await UserFactory.merge({ email: 'vehicle.odometer.spec@test.com' }).create());
 
         vehicle = {
             vin: faker.vehicle.vin(),
@@ -28,9 +26,7 @@ test.group('api/vehicles', (group) => {
         };
     });
 
-    test('POST api/vehicles responds with auth error when no token is provided', async ({
-        client,
-    }) => {
+    test('POST api/vehicles responds with auth error when no token is provided', async ({ client }) => {
         const response = await client.post('/api/vehicles').json(vehicle);
 
         response.assertStatus(401);
@@ -40,11 +36,7 @@ test.group('api/vehicles', (group) => {
     });
 
     test('POST api/vehicles creates a vehicle', async ({ client }) => {
-        const response = await client
-            .post('/api/vehicles')
-            .guard('api')
-            .loginAs(user)
-            .json(vehicle);
+        const response = await client.post('/api/vehicles').guard('api').loginAs(user).json(vehicle);
 
         response.assertBodyContains({
             id: Number,
@@ -62,11 +54,7 @@ test.group('api/vehicles', (group) => {
     test('POST api/vehicles does not create a duplicate', async ({ client }) => {
         await client.post('/api/vehicles').guard('api').loginAs(user).json(vehicle);
 
-        const response = await client
-            .post('/api/vehicles')
-            .guard('api')
-            .loginAs(user)
-            .json(vehicle);
+        const response = await client.post('/api/vehicles').guard('api').loginAs(user).json(vehicle);
 
         response.assertBodyContains({
             message: `E_VEHICLE_EXISTS: A vehicle with registration number ${vehicle.reg_no.toUpperCase()} has already been added`,
@@ -77,18 +65,12 @@ test.group('api/vehicles', (group) => {
     test('POST api/vehicles removes non-alphanumeric characters', async ({ client }) => {
         vehicle.reg_no = 'ABC @ 123';
 
-        const response = await client
-            .post('/api/vehicles')
-            .guard('api')
-            .loginAs(user)
-            .json(vehicle);
+        const response = await client.post('/api/vehicles').guard('api').loginAs(user).json(vehicle);
 
         response.assertBodyContains({ user_id: user.id, reg_no: 'ABC123' });
     });
 
-    test('GET api/vehicles responds with auth error when no token is provided', async ({
-        client,
-    }) => {
+    test('GET api/vehicles responds with auth error when no token is provided', async ({ client }) => {
         const response = await client.get('/api/vehicles').json(vehicle);
 
         response.assertStatus(401);
