@@ -61,22 +61,11 @@ export class JourneyStateApi {
         }
 
         if (activeJourney.status === 'new') {
-            const delta = distance ?? calculateDistanceChange(activeJourney.startLocation, { lat, lon });
-            const newDistance = activeJourney.distance + delta;
-
-            log.info(`${ctx} Journey ${activeJourney.id} is new. Setting distance to ${newDistance}`);
-
-            const inProgressJourney: InProgressJourney = {
-                ...activeJourney,
-                status: 'inProgress',
-                lastLocation: { lat, lon },
-                lastReadingDate: createdAtDate,
-                lastSignificantReadingDate: createdAtDate,
-                distance: newDistance,
-            };
-            await this.database.put(activeJourney.id, inProgressJourney);
-            return inProgressJourney;
+            log.info(`${ctx} Journey ${activeJourney.id} is new`);
+            return this.updateNewJourneyDistance({ newJourney: activeJourney, lat, lon, distance, createdAtDate });
         }
+
+        log.info(`${ctx} Journey ${activeJourney.id} is in progress`);
 
         const timeSinceLastReading =
             new Date(createdAtDate).getTime() - new Date(activeJourney.lastReadingDate).getTime();
@@ -84,14 +73,13 @@ export class JourneyStateApi {
         const actualVelocity = velocity ?? (1000 * actualDistance) / timeSinceLastReading;
         const lastSignificantReadingDate = activeJourney.lastSignificantReadingDate;
 
-        log.info(`${ctx} Journey ${activeJourney.id} is in progress.`);
         if (
             this.shouldStopJourney({
                 velocity: actualVelocity,
                 timeSinceLastSignificantReading: createdAtDate.getTime() - lastSignificantReadingDate.getTime(),
             })
         ) {
-            log.info(`Stopping journey ${activeJourney.id}.`, {
+            log.info(`Stopping journey ${activeJourney.id}`, {
                 actualVelocity,
                 lastSignificantReadingDate,
             });
@@ -99,23 +87,14 @@ export class JourneyStateApi {
         }
 
         // update distance
-        const newDistance = activeJourney.distance + actualDistance;
-
-        log.info(
-            `${ctx} Journey ${activeJourney.id} is in progress. Updating distance by ${actualDistance} to ${newDistance}`
-        );
-        const updatedJourney: InProgressJourney = {
-            ...activeJourney,
-            lastLocation: { lat, lon },
-            lastReadingDate: createdAtDate,
-            lastSignificantReadingDate:
-                actualVelocity < MAXIMUM_VELOCITY_TO_STOP_JOURNEY_IN_METERS_PER_SECOND
-                    ? activeJourney.lastSignificantReadingDate
-                    : createdAtDate,
-            distance: newDistance,
-        };
-        await this.database.put(updatedJourney.id, updatedJourney);
-        return updatedJourney;
+        return this.updateExistingJourneyDistance({
+            activeJourney,
+            distanceToAdd: actualDistance,
+            lat,
+            lon,
+            velocity: actualVelocity,
+            createdAtDate,
+        });
     }
 
     public async startNewJourney({
@@ -141,6 +120,85 @@ export class JourneyStateApi {
         };
         await this.database.put(journeyId, journey);
         return journey;
+    }
+
+    private async updateNewJourneyDistance({
+        newJourney,
+        lat,
+        lon,
+        distance,
+        createdAtDate,
+    }: {
+        newJourney: NewJourney;
+        lat: number;
+        lon: number;
+        createdAtDate: Date;
+        distance?: number;
+    }): Promise<InProgressJourney> {
+        const ctx = logContext(
+            `${JourneyStateApi.name}.${this.updateNewJourneyDistance.name}`,
+            { journeyId: newJourney.id, userId: newJourney.userId },
+            log
+        );
+        const delta = distance ?? calculateDistanceChange(newJourney.startLocation, { lat, lon });
+        const newDistance = newJourney.distance + delta;
+
+        log.info(`${ctx} Setting distance to ${newDistance}`);
+
+        const inProgressJourney: InProgressJourney = {
+            ...newJourney,
+            status: 'inProgress',
+            lastLocation: { lat, lon },
+            lastReadingDate: createdAtDate,
+            lastSignificantReadingDate: createdAtDate,
+            distance: newDistance,
+        };
+
+        await this.database.put(newJourney.id, inProgressJourney);
+        return inProgressJourney;
+    }
+
+    private async updateExistingJourneyDistance({
+        activeJourney,
+        distanceToAdd,
+        lat,
+        lon,
+        velocity,
+        createdAtDate,
+    }: {
+        activeJourney: InProgressJourney;
+        distanceToAdd: number;
+        lat: number;
+        lon: number;
+        velocity: number;
+        createdAtDate: Date;
+    }): Promise<InProgressJourney> {
+        const newDistance = activeJourney.distance + distanceToAdd;
+
+        const ctx = logContext(`${JourneyStateApi.name}.${this.startNewJourney.name}`, {
+            journeyId: activeJourney.id,
+            userId: activeJourney.userId,
+            startTime: activeJourney.startTime,
+        });
+
+        log.info(
+            `${ctx} Journey ${activeJourney.id} is in progress. Updating distance by ${distanceToAdd} to ${newDistance}`
+        );
+
+        const updatedJourney: InProgressJourney = {
+            ...activeJourney,
+            lastLocation: { lat, lon },
+            lastReadingDate: createdAtDate,
+            lastSignificantReadingDate:
+                velocity < MAXIMUM_VELOCITY_TO_STOP_JOURNEY_IN_METERS_PER_SECOND
+                    ? activeJourney.lastSignificantReadingDate
+                    : createdAtDate,
+            distance: newDistance,
+        };
+
+        await this.database.put(updatedJourney.id, updatedJourney);
+
+        return updatedJourney;
     }
 
     // TODO - Save journey details
