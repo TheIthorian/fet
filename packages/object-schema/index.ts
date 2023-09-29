@@ -5,9 +5,7 @@ import { SchemaValidationError } from 'fet-errors';
 
 const log = makeLogger(module);
 
-export function QuerySchemaValidator<SchemaType extends z.ZodType>(
-    schema: SchemaType
-): RequestHandler {
+export function QuerySchemaValidator<SchemaType extends z.ZodType>(schema: SchemaType): RequestHandler {
     const ctx = logContext(QuerySchemaValidator.name, {}, log);
     return function schemaValidation(req, res, next) {
         log.info(`${ctx} - validating query (${req.query ?? 'no query'})`);
@@ -25,9 +23,7 @@ export function QuerySchemaValidator<SchemaType extends z.ZodType>(
     };
 }
 
-export function BodySchemaValidator<SchemaType extends z.ZodType>(
-    schema: SchemaType
-): RequestHandler {
+export function BodySchemaValidator<SchemaType extends z.ZodType>(schema: SchemaType): RequestHandler {
     const ctx = logContext(BodySchemaValidator.name, {}, log);
     return function schemaValidation(req, res, next) {
         log.info(`${ctx} - validating body (${req.body ? JSON.stringify(req.body) : 'no body'})`);
@@ -45,9 +41,7 @@ export function BodySchemaValidator<SchemaType extends z.ZodType>(
     };
 }
 
-export function ParamSchemaValidator<SchemaType extends z.ZodType>(
-    schema: SchemaType
-): RequestHandler {
+export function ParamSchemaValidator<SchemaType extends z.ZodType>(schema: SchemaType): RequestHandler {
     const ctx = logContext(ParamSchemaValidator.name, {}, log);
     return function schemaValidation(req, res, next) {
         log.info(`${ctx} - validating params (${JSON.stringify(req.params) ?? 'no params'})`);
@@ -59,9 +53,7 @@ export function ParamSchemaValidator<SchemaType extends z.ZodType>(
             throw new SchemaValidationError('params', JSON.parse(error.message));
         } else {
             res.locals.parsedParams = result.data;
-            log.info(
-                `${ctx} - res.locals.parsedParams: ${JSON.stringify(req.params) ?? 'no params'}`
-            );
+            log.info(`${ctx} - res.locals.parsedParams: ${JSON.stringify(req.params) ?? 'no params'}`);
         }
 
         next();

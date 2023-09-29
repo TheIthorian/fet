@@ -14,9 +14,7 @@ test.group('GET /api/me/config', (group) => {
     });
 
     group.each.setup(async () => {
-        user = await User.create(
-            await UserFactory.merge({ email: 'test@user.spec.ts.login' }).create()
-        );
+        user = await User.create(await UserFactory.merge({ email: 'test@user.spec.ts.login' }).create());
     });
 
     test('responds with auth error when no token is provided', async ({ client }) => {
@@ -31,9 +29,7 @@ test.group('GET /api/me/config', (group) => {
     test('gets the current user config', async ({ client }) => {
         // Create some vehicles for the user
         const vehicleCount = 4;
-        await Vehicle.createMany(
-            await VehicleFactory.merge({ userId: user.id }).makeMany(vehicleCount)
-        );
+        await Vehicle.createMany(await VehicleFactory.merge({ userId: user.id }).makeMany(vehicleCount));
 
         const response = await client.get('/api/me/config').guard('api').loginAs(user);
 

@@ -7,10 +7,7 @@ import { logContext } from 'App/util/logger';
 import { makeClient } from 'fet-journey-service-client';
 import fs from 'node:fs/promises';
 
-const journeyServiceClient = makeClient(
-    Env.get('JOURNEY_SERVICE_URL'),
-    Env.get('JOURNEY_SERVICE_API_KEY')
-);
+const journeyServiceClient = makeClient(Env.get('JOURNEY_SERVICE_URL'), Env.get('JOURNEY_SERVICE_API_KEY'));
 
 export default class LocationController {
     public async handleLocationUpdate({ request, response }: HttpContextContract) {

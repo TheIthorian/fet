@@ -28,9 +28,7 @@ test.group('api/location/:integrationName', (group) => {
     });
 
     group.each.setup(async () => {
-        user = await User.create(
-            await UserFactory.merge({ email: 'location.spec@test.com' }).create()
-        );
+        user = await User.create(await UserFactory.merge({ email: 'location.spec@test.com' }).create());
 
         const integration = await Integration.findBy('name', 'owntracks');
         if (!integration) throw new Error('owntracks integration not found!');
@@ -41,9 +39,7 @@ test.group('api/location/:integrationName', (group) => {
         }));
     });
 
-    test('POST api/location/:integrationName responds with location and user', async ({
-        client,
-    }) => {
+    test('POST api/location/:integrationName responds with location and user', async ({ client }) => {
         const tst = 1695838770;
         const readingTime = new Date(tst * 1000);
 
@@ -68,9 +64,7 @@ test.group('api/location/:integrationName', (group) => {
                 },
             });
 
-        const response = await client
-            .post(`api/location/owntracks?apiKey=${apiKey}`)
-            .json({ lon, lat, tst, vel: 10 });
+        const response = await client.post(`api/location/owntracks?apiKey=${apiKey}`).json({ lon, lat, tst, vel: 10 });
 
         response.assertBodyContains({
             userId: user.id,
@@ -84,9 +78,7 @@ test.group('api/location/:integrationName', (group) => {
     test('POST api/location/:integrationName responds with error when integration name is invalid', async ({
         client,
     }) => {
-        const response = await client
-            .post(`api/location/invalid_integration?apiKey=${apiKey}`)
-            .json({ lon, lat });
+        const response = await client.post(`api/location/invalid_integration?apiKey=${apiKey}`).json({ lon, lat });
 
         response.assertStatus(400);
         response.assertBodyContains({
@@ -98,14 +90,11 @@ test.group('api/location/:integrationName', (group) => {
     test('POST api/location/:integrationName responds with error when the api key provided is invalid', async ({
         client,
     }) => {
-        const response = await client
-            .post(`api/location/owntracks?apiKey=invalid`)
-            .json({ lon, lat });
+        const response = await client.post(`api/location/owntracks?apiKey=invalid`).json({ lon, lat });
 
         response.assertStatus(401);
         response.assertBodyContains({
-            message:
-                'E_API_KEY_NOT_RECOGNISED: The api key provided for owntracks is not recognised',
+            message: 'E_API_KEY_NOT_RECOGNISED: The api key provided for owntracks is not recognised',
             code: 'E_API_KEY_NOT_RECOGNISED',
         });
     });
@@ -113,9 +102,7 @@ test.group('api/location/:integrationName', (group) => {
     test('POST api/location/:integrationName responds with error when the request body is invalid', async ({
         client,
     }) => {
-        const response = await client
-            .post(`api/location/owntracks?apiKey=${apiKey}`)
-            .json({ long: lon, lat });
+        const response = await client.post(`api/location/owntracks?apiKey=${apiKey}`).json({ long: lon, lat });
 
         response.assertStatus(422);
         response.assertBodyContains({

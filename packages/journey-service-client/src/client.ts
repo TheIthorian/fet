@@ -49,25 +49,16 @@ export class JourneyServiceClient implements IJourneyServiceClient {
 
     async updateDistance(input: UpdateDistanceInput): Promise<UpdateDistanceOutput> {
         const { userId, journeyId, coordinates } = input;
-        logContext(
-            `${JourneyServiceClient.name}.${this.updateDistance.name}`,
-            { userId, journeyId },
-            log
-        );
+        logContext(`${JourneyServiceClient.name}.${this.updateDistance.name}`, { userId, journeyId }, log);
 
-        return await this.microserviceClient.post(
-            `/api/users/${userId}/journey/${journeyId}/location`,
-            { body: { coordinates } }
-        );
+        return await this.microserviceClient.post(`/api/users/${userId}/journey/${journeyId}/location`, {
+            body: { coordinates },
+        });
     }
 
     async endJourney(input: EndJourneyInput): Promise<EndJourneyOutput> {
         const { userId, journeyId, carId } = input;
-        logContext(
-            `${JourneyServiceClient.name}.${this.endJourney.name}`,
-            { userId, journeyId, carId },
-            log
-        );
+        logContext(`${JourneyServiceClient.name}.${this.endJourney.name}`, { userId, journeyId, carId }, log);
 
         return await this.microserviceClient.post(`/api/users/${userId}/journey/${journeyId}/end`, {
             body: { carId },

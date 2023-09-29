@@ -30,10 +30,7 @@ Route.post('logout', 'AuthController.logout').middleware('auth');
 Route.get('api/me', 'AuthController.me').middleware('auth');
 
 Route.get('api/me/integrations', 'IntegrationApiKeysController.index').middleware('auth');
-Route.post(
-    'api/me/integrations/:integration_name',
-    'IntegrationApiKeysController.create'
-).middleware('auth');
+Route.post('api/me/integrations/:integration_name', 'IntegrationApiKeysController.create').middleware('auth');
 
 Route.post('api/location/:integrationName', 'LocationController.handleLocationUpdate');
 

@@ -10,10 +10,7 @@ export function errorHandler() {
 
         if (error instanceof AppError) {
             if (error.logError) {
-                log.error(
-                    { name: error.name, message: error.message, data: error.data as object },
-                    'AppError'
-                );
+                log.error({ name: error.name, message: error.message, data: error.data as object }, 'AppError');
             }
 
             res.status(error.status);

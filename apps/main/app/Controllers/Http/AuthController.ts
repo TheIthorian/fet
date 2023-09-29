@@ -13,10 +13,7 @@ export default class AuthController {
 
         const data = await request.validate({ schema: userSchema });
 
-        const hasExistingUser = await User.query()
-            .select('id')
-            .from('users')
-            .where('email', data.email);
+        const hasExistingUser = await User.query().select('id').from('users').where('email', data.email);
 
         if (hasExistingUser.length) {
             throw EmailAlreadyExistsException.new(data.email);

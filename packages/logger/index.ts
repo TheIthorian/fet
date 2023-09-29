@@ -22,10 +22,7 @@ export interface Logger {
 }
 
 export function makeLogger(module: Module | undefined, level = DEFAULT_LEVEL): Logger {
-    const streams = [
-        { stream: process.stdout },
-        { stream: createWriteStream('app.log', { flags: 'a' }) },
-    ];
+    const streams = [{ stream: process.stdout }, { stream: createWriteStream('app.log', { flags: 'a' }) }];
 
     let name = 'unknown';
     if (module?.filename) {

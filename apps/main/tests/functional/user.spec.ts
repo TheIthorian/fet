@@ -97,9 +97,7 @@ test.group('POST /login', (group) => {
     });
 
     test('does not create a token when credentials are incorrect', async ({ client }) => {
-        const response = await client
-            .post('/login')
-            .json({ email, password: 'an incorrect password' });
+        const response = await client.post('/login').json({ email, password: 'an incorrect password' });
 
         response.assertStatus(400);
         response.assertBodyContains({
