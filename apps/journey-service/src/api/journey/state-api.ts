@@ -12,6 +12,29 @@ const MAXIMUM_VELOCITY_TO_STOP_JOURNEY_IN_METERS_PER_SECOND = 1;
 
 const MINIMUM_STATIONARY_TIME_BEFORE_END_IN_MILLISECONDS = 1 * 60 * 1000; // 1 min
 
+interface StartNewJourneyInput {
+    userId: number;
+    startTime: Date;
+    startLocation: Coordinates;
+}
+
+interface UpdateNewJourneyDistanceInput {
+    newJourney: NewJourney;
+    lat: number;
+    lon: number;
+    createdAtDate: Date;
+    distance?: number;
+}
+
+interface UpdateExistingJourneyDistanceInput {
+    activeJourney: InProgressJourney;
+    distanceToAdd: number;
+    lat: number;
+    lon: number;
+    velocity: number;
+    createdAtDate: Date;
+}
+
 export class JourneyStateApi {
     constructor(
         private readonly database: Database<NewJourney | InProgressJourney | CompletedJourney>,
@@ -97,15 +120,7 @@ export class JourneyStateApi {
         });
     }
 
-    public async startNewJourney({
-        userId,
-        startTime,
-        startLocation,
-    }: {
-        userId: number;
-        startTime: Date;
-        startLocation: Coordinates;
-    }): Promise<NewJourney> {
+    public async startNewJourney({ userId, startTime, startLocation }: StartNewJourneyInput): Promise<NewJourney> {
         const journeyId = ulid();
         logContext(`${JourneyStateApi.name}.${this.startNewJourney.name}`, { journeyId, userId, startTime }, log);
 
@@ -128,13 +143,7 @@ export class JourneyStateApi {
         lon,
         distance,
         createdAtDate,
-    }: {
-        newJourney: NewJourney;
-        lat: number;
-        lon: number;
-        createdAtDate: Date;
-        distance?: number;
-    }): Promise<InProgressJourney> {
+    }: UpdateNewJourneyDistanceInput): Promise<InProgressJourney> {
         const ctx = logContext(
             `${JourneyStateApi.name}.${this.updateNewJourneyDistance.name}`,
             { journeyId: newJourney.id, userId: newJourney.userId },
@@ -165,14 +174,7 @@ export class JourneyStateApi {
         lon,
         velocity,
         createdAtDate,
-    }: {
-        activeJourney: InProgressJourney;
-        distanceToAdd: number;
-        lat: number;
-        lon: number;
-        velocity: number;
-        createdAtDate: Date;
-    }): Promise<InProgressJourney> {
+    }: UpdateExistingJourneyDistanceInput): Promise<InProgressJourney> {
         const newDistance = activeJourney.distance + distanceToAdd;
 
         const ctx = logContext(`${JourneyStateApi.name}.${this.startNewJourney.name}`, {
