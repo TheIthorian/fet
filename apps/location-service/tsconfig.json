@@ -1,0 +1,15 @@
+{
+    "extends": "adonis-preset-ts/tsconfig.json",
+    "include": ["**/*"],
+    "exclude": ["node_modules", "build"],
+    "compilerOptions": {
+        "lib": ["ESNext"],
+        "baseUrl": "./",
+        "outDir": "build",
+        "rootDir": "./",
+        "sourceMap": true,
+        "paths": {
+            "src/*": ["./src/*"]
+        }
+    }
+}
