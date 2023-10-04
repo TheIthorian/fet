@@ -1,6 +1,10 @@
+import { makeLogger } from 'fet-logger';
 import { fetch } from 'undici';
 
+const log = makeLogger(module);
+
 export async function request(...args: Parameters<typeof fetch>) {
+    log.debug(`${args[1]?.method} -> ${args[0]}`);
     const response = await fetch(...args);
 
     const hasJsonBody = response.headers.get('content-type')?.includes('application/json');

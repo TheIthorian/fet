@@ -1,8 +1,12 @@
 import { request } from 'fet-http';
+import { logContext, makeLogger } from 'fet-logger';
+
+const log = makeLogger(module);
 
 export interface DiscoverLocationInput {
     lat: number;
     lon: number;
+    q: string;
     limit?: number;
 }
 
@@ -48,19 +52,29 @@ export class HereClient {
     constructor(
         private readonly baseUrl: string,
         private readonly apiKey: string
-    ) {}
+    ) {
+        log.info(`Created HereClient with baseUrl: ${this.baseUrl} and apiKey: ${this.apiKey}`);
+    }
 
-    async discoverLocation({ lat, lon, limit = 1 }: DiscoverLocationInput): Promise<DiscoverLocationItem[]> {
+    async discoverLocation({
+        lat,
+        lon,
+        q,
+        limit = 1,
+    }: DiscoverLocationInput): Promise<{ items: DiscoverLocationItem[] }> {
+        logContext(`${HereClient.name}.${this.discoverLocation.name}`, { lat, lon, limit, q }, log);
+
         const searchParams = new URLSearchParams({
             at: `${lat},${lon}`,
             limit: String(limit),
+            q,
+            apiKey: this.apiKey,
         });
 
         const response = await request(`${this.baseUrl}/discover?${searchParams.toString()}`, {
             method: 'GET',
-            headers: { apiKey: this.apiKey },
         });
 
-        return (await response.json()) as DiscoverLocationItem[];
+        return (await response.json()) as { items: DiscoverLocationItem[] };
     }
 }

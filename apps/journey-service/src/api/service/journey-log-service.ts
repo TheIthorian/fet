@@ -40,7 +40,8 @@ export class JourneyLogService {
             });
             log.info(`${ctx} - saved journey ${savedJourney.id}`);
         } catch (error) {
-            log.error(`${ctx} Error posting completed journey`, error);
+            log.error(`${ctx} Error posting completed journey`);
+            log.error(error);
         }
     }
 
