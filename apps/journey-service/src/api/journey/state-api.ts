@@ -203,7 +203,6 @@ export class JourneyStateApi {
         return updatedJourney;
     }
 
-    // TODO - Save journey details
     public async stopJourney(journey: InProgressJourney, endTime: Date): Promise<CompletedJourney> {
         logContext(`${JourneyStateApi.name}.${this.stopJourney.name}`, { journeyId: journey.id, endTime }, log);
 
@@ -288,8 +287,3 @@ export function haversineCalc(previousCoordinates: Coordinates, currentCoordinat
     const distance = earthRadiusInMeters * c;
     return distance;
 }
-
-// function isAtPetrolStation({ lat, lon }: Coordinates): Promise<boolean> {
-//     log.info({ lat, lon });
-//     return Promise.resolve(false);
-// }
