@@ -1,11 +1,27 @@
-import type { MicroserviceClient } from 'fet-http';
+import { MicroserviceClient } from 'fet-http';
 import { logContext, makeLogger } from 'fet-logger';
 import type { CompletedJourney } from '../journey/types';
+import config from '../../config';
+import type { LocationService } from './location/types';
+import { HERELocationService } from './location';
+import { HereClient } from './location/here-client';
 
 const log = makeLogger(module);
 
+export function makeJourneyLogService(): JourneyLogService {
+    const journeyLogMsClient = new MicroserviceClient(config.mainApp.url!, config.mainApp.apiKey!);
+
+    const hereClient = new HereClient(config.hereApi.discoverSearchUrl, config.hereApi.apiKey!);
+    const hereLocationService = new HERELocationService(hereClient);
+
+    return new JourneyLogService(journeyLogMsClient, hereLocationService);
+}
+
 export class JourneyLogService {
-    constructor(private readonly msClient: MicroserviceClient) {}
+    constructor(
+        private readonly msClient: MicroserviceClient,
+        private readonly locationService: LocationService
+    ) {}
 
     public async saveCompletedJourney(completedJourney: CompletedJourney): Promise<void> {
         const ctx = logContext(
@@ -18,12 +34,31 @@ export class JourneyLogService {
         );
 
         try {
+            const completedJourneyWithLocationDetails = await this.enhanceWithLocationDetails(completedJourney);
             const savedJourney = await this.msClient.post<CompletedJourney>('/iapi/journey', {
-                body: completedJourney,
+                body: completedJourneyWithLocationDetails,
             });
             log.info(`${ctx} - saved journey ${savedJourney.id}`);
         } catch (error) {
             log.error(`${ctx} Error posting completed journey`, error);
         }
     }
+
+    private async enhanceWithLocationDetails(
+        completedJourney: CompletedJourney
+    ): Promise<CompletedJourneyWithLocationDetails> {
+        const { isAtPetrolStation } = await this.locationService.getLocationDetails({
+            lat: completedJourney.lastLocation.lat,
+            lon: completedJourney.lastLocation.lon,
+        });
+
+        return {
+            ...completedJourney,
+            isAtPetrolStation,
+        };
+    }
+}
+
+interface CompletedJourneyWithLocationDetails extends CompletedJourney {
+    isAtPetrolStation: boolean;
 }
