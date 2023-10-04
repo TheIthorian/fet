@@ -15,7 +15,8 @@
         "LOCATION_SERVICE_NODE_ENV",
         "LOCATION_SERVICE_API_KEY",
         "MAIN_APP_URL",
-        "MAIN_APP_INTERNAL_KEY"
+        "MAIN_APP_INTERNAL_KEY",
+        "HERE_APP_KEY"
     ],
     "pipeline": {
         "build": {
