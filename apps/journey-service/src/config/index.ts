@@ -1,5 +1,5 @@
 import 'dotenv/config'; // Load .env file
-import { validateObjectIsNotNull } from '../utils/config-validation';
+// import { validateObjectIsNotNull } from '../utils/config-validation';
 
 const config = {
     databaseUrl: process.env.JOURNEY_SERVICE_DATABASE_URL ?? 'file:./dev.db',
@@ -24,6 +24,6 @@ const config = {
     },
 };
 
-validateObjectIsNotNull(config);
+// validateObjectIsNotNull(config);
 
 export default config;
