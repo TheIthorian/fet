@@ -21,6 +21,7 @@ export default class JourneysController {
                 lon: schema.number(),
                 lat: schema.number(),
             }),
+            isAtPetrolStation: schema.boolean.optional(),
         });
 
         const data = await request.validate({ schema: journeySchema });
@@ -35,6 +36,7 @@ export default class JourneysController {
             startLocationLon: data.startLocation.lon,
             lastLocationLat: data.lastLocation.lat,
             lastLocationLon: data.lastLocation.lon,
+            isAtPetrolStation: data.isAtPetrolStation || false,
         });
 
         Logger.info(`${ctx} created  journey`, { id: journey.id });
