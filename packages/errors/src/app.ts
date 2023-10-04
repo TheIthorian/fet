@@ -80,3 +80,12 @@ export class SchemaValidationError extends AppError<object> {
         super('Invalid request: ', SchemaValidationError.name, { data: { type, validationError } });
     }
 }
+
+export class ConfigError extends AppError<object> {
+    status = 500;
+    constructor(data: Record<string, unknown>) {
+        super('Missing required config: ' + JSON.stringify(data), ConfigError.name, {
+            data: undefined,
+        });
+    }
+}
