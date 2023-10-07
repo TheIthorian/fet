@@ -1,10 +1,10 @@
-import { Button, Header } from 'ui';
+'use client';
+
+import { useRouter } from 'next/navigation';
 
 export default function Page(): JSX.Element {
-    return (
-        <>
-            <Header text='Web' />
-            <Button />
-        </>
-    );
+    const router = useRouter();
+    router.push('/dashboard');
+
+    return <>Index</>;
 }
