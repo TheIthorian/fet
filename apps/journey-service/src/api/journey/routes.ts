@@ -4,17 +4,14 @@ import { PostLocationBodySchema, PostLocationParamsSchema } from 'fet-journey-se
 import type { PostLocationBodyInput, PostLocationParamsInput } from 'fet-journey-service-client';
 import { BodySchemaValidator, ParamSchemaValidator } from 'fet-object-schema';
 import type { ParsedBodyResponse, ParsedParamsResponse } from 'fet-object-schema';
-import { MicroserviceClient } from 'fet-http';
-import config from '../../config';
-import { JourneyLogService } from '../service/journey-log-service';
+import { makeJourneyLogService } from '../service/journey-log-service';
 import { MemoryDatabase } from './database';
 import { JourneyStateApi } from './state-api';
 import type { CompletedJourney, InProgressJourney, NewJourney } from './types';
 
-const journeyLogMsClient = new MicroserviceClient(config.mainApp.url, config.mainApp.apiKey);
 export const journeyStateApi = new JourneyStateApi(
     new MemoryDatabase<NewJourney | InProgressJourney | CompletedJourney>(),
-    new JourneyLogService(journeyLogMsClient)
+    makeJourneyLogService()
 );
 
 type H = Handler[];

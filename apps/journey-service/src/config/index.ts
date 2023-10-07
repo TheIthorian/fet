@@ -1,21 +1,40 @@
+// eslint-disable-next-line eslint-comments/disable-enable-pair
+/* eslint-disable @typescript-eslint/no-var-requires */
+// import { validateObjectIsNotNull } from '../utils/config-validation';
 import 'dotenv/config'; // Load .env file
 
-const config = {
-    databaseUrl: process.env.JOURNEY_SERVICE_DATABASE_URL ?? 'file:./dev.db',
-    databaseType:
-        (process.env.JOURNEY_SERVICE_DATABASE_URL?.split(':')?.[0] as 'file' | 'postgres' | undefined) ?? 'file',
+import { testConfig } from './tst';
+import { prodConfig } from './prod';
+import { devConfig } from './dev';
 
-    host: process.env.JOURNEY_SERVICE_HOST ?? '127.0.0.1',
-    port: Number(process.env.JOURNEY_SERVICE_PORT ?? 3010),
-
-    apiKey: 'internal_key',
-
-    isTest: process.env.JOURNEY_SERVICE_NODE_ENV === 'test',
-
+interface Config {
+    databaseUrl: string;
+    databaseType: string;
+    host: string;
+    port: number;
+    apiKey: string;
+    isTest: boolean;
     mainApp: {
-        url: process.env.MAIN_APP_URL ?? '',
-        apiKey: process.env.MAIN_APP_INTERNAL_KEY ?? '',
-    },
-};
+        url: string;
+        apiKey: string;
+    };
+    hereApi: {
+        discoverSearchUrl: string;
+        apiKey: string;
+    };
+}
 
-export default config;
+// eslint-disable-next-line import/no-mutable-exports
+let cfg: Config;
+
+if (process.env.NODE_ENV === 'test') {
+    cfg = testConfig;
+} else if (process.env.NODE_ENV === 'production') {
+    cfg = prodConfig;
+} else {
+    cfg = devConfig;
+}
+
+// validateObjectIsNotNull(config);
+
+export const config = cfg;

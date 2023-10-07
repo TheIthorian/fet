@@ -26,6 +26,9 @@ export default class Journey extends BaseModel {
     @column()
     public distance: number;
 
+    @column()
+    public isAtPetrolStation: boolean;
+
     @column.dateTime()
     public endTime: DateTime;
 

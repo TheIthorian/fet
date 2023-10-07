@@ -2,7 +2,8 @@
     "private": true,
     "scripts": {
         "build": "turbo run build",
-        "dev": "turbo run dev --concurrency=15",
+        "dev": "turbo run dev --concurrency=16",
+        "start": "turbo run start --concurrency=16",
         "lint": "turbo run lint",
         "format": "prettier --write \"**/*.{ts,tsx,md}\"",
         "test": "turbo run test",

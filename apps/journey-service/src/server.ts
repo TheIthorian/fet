@@ -1,7 +1,7 @@
 import { createServer as createHttpServer, type Server } from 'node:http';
 import type express from 'express';
 import { makeLogger } from 'fet-logger';
-import config from './config';
+import { config } from './config';
 
 const log = makeLogger(module);
 

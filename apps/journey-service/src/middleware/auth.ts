@@ -1,7 +1,7 @@
 import type { NextFunction, Request, Response } from 'express';
 import { ApiKeyAuthenticationError } from 'fet-errors';
 import { makeLogger } from 'fet-logger';
-import config from '../config';
+import { config } from '../config';
 
 const log = makeLogger(module);
 

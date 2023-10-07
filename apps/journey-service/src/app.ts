@@ -1,6 +1,6 @@
 import express from 'express';
 import { makeLogger } from 'fet-logger';
-import config from './config';
+import { config } from './config';
 import { startup } from './express';
 import { startHttpServer } from './server';
 
