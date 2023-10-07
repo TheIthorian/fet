@@ -48,7 +48,11 @@ export interface DiscoverLocationItem {
     chains: LocationChain[];
 }
 
-export class HereClient {
+export interface IHereClient {
+    discoverLocation: (input: DiscoverLocationInput) => Promise<{ items: DiscoverLocationItem[] }>;
+}
+
+export class HereClient implements IHereClient {
     constructor(
         private readonly baseUrl: string,
         private readonly apiKey: string
