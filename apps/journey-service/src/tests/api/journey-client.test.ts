@@ -1,18 +1,28 @@
 import { faker } from '@faker-js/faker';
 import { makeClient } from 'fet-journey-service-client';
-import config from '../../config';
+import { mockHereClient } from '../../api/service/location/__mocks__/here-client';
+import { config } from '../../config';
 import type { App } from '../utils';
 import { getApp } from '../utils';
 
 const apiKey = config.apiKey;
 const jsClient = makeClient(`http://${config.host}:${config.port}`, apiKey);
 
+jest.mock('../../api/service/location/here-client', () => ({
+    makeHereClient: jest.fn().mockReturnValue(mockHereClient),
+}));
+
 describe('JourneyServiceClient', () => {
     const userId = faker.number.int();
     let app: App;
 
     beforeAll(async () => {
+        jest.mocked(mockHereClient.discoverLocation).mockResolvedValue({ items: [] });
         app = await getApp();
+    });
+
+    afterEach(() => {
+        jest.resetAllMocks();
     });
 
     afterAll(async () => {
@@ -20,13 +30,14 @@ describe('JourneyServiceClient', () => {
     });
 
     describe('happy path', () => {
-        it('should create a journey, update its location, and end it when using the location handler', async () => {
-            const startDate = new Date();
-            const reading2Date = new Date(startDate.getTime() + 10_000);
-            const reading3Date = new Date(reading2Date.getTime() + 10_000);
-            const reading4Date = new Date(reading3Date.getTime() + 100_000);
+        const startDate = new Date();
+        const reading2Date = new Date(startDate.getTime() + 10_000);
+        const reading3Date = new Date(reading2Date.getTime() + 10_000);
+        const reading4Date = new Date(reading3Date.getTime() + 100_000);
 
-            // Creates journey
+        let journeyId: string;
+
+        it('should create a journey when velocity is high enough', async () => {
             const { journey } = await jsClient.postLocation({
                 userId,
                 lat: 51.5,
@@ -49,7 +60,10 @@ describe('JourneyServiceClient', () => {
                 throw new Error('Journey not created');
             }
 
-            // Updates position
+            journeyId = journey.id;
+        });
+
+        it('should update journey location', async () => {
             const { journey: inProgressJourney } = await jsClient.postLocation({
                 userId,
                 lat: 51.6,
@@ -59,7 +73,7 @@ describe('JourneyServiceClient', () => {
             });
 
             expect(inProgressJourney).toMatchObject({
-                id: journey.id,
+                id: journeyId,
                 userId,
                 startTime: startDate.toISOString(),
                 status: 'inProgress',
@@ -69,8 +83,9 @@ describe('JourneyServiceClient', () => {
                 lastSignificantReadingDate: reading2Date.toISOString(),
                 distance: 11157.441621057978,
             });
+        });
 
-            // Updates position again
+        it('should update journey location a second time', async () => {
             const { journey: inProgressJourney2 } = await jsClient.postLocation({
                 userId,
                 lat: 51.75,
@@ -80,7 +95,7 @@ describe('JourneyServiceClient', () => {
             });
 
             expect(inProgressJourney2).toMatchObject({
-                id: journey.id,
+                id: journeyId,
                 userId,
                 startTime: startDate.toISOString(),
                 status: 'inProgress',
@@ -90,18 +105,24 @@ describe('JourneyServiceClient', () => {
                 lastSignificantReadingDate: reading3Date.toISOString(),
                 distance: 27888.060536859804,
             });
+        });
 
-            // Ends journey
+        it('end the journey', async () => {
+            const lat = 51.7;
+            const lon = -0.16;
+
+            jest.mocked(mockHereClient.discoverLocation).mockResolvedValue({ items: [] });
+
             const { journey: completedJourney } = await jsClient.postLocation({
                 userId,
-                lat: 51.7,
-                lon: -0.16,
+                lat,
+                lon,
                 created_at: reading4Date.toISOString(),
                 velocity: 0,
             });
 
             expect(completedJourney).toMatchObject({
-                id: journey.id,
+                id: journeyId,
                 userId,
                 startTime: startDate.toISOString(),
                 status: 'completed',
@@ -110,20 +131,27 @@ describe('JourneyServiceClient', () => {
                 distance: 27888.060536859804,
                 endTime: reading4Date.toISOString(),
             });
-        });
 
-        it('does not start journey when velocity is not high enough', async () => {
-            const startDate = new Date();
-
-            const response = await jsClient.postLocation({
-                userId,
-                lat: 51.5,
-                lon: -0.14,
-                created_at: startDate.toISOString(),
-                velocity: 6.5,
+            expect(mockHereClient.discoverLocation).toHaveBeenCalledTimes(1);
+            expect(mockHereClient.discoverLocation).toHaveBeenCalledWith({
+                lat: 51.75,
+                lon: -0.165, // use previous location
+                q: 'petrol station',
             });
-
-            expect(response).toStrictEqual({});
         });
+    });
+
+    it('does not start journey when velocity is not high enough', async () => {
+        const startDate = new Date();
+
+        const response = await jsClient.postLocation({
+            userId,
+            lat: 51.5,
+            lon: -0.14,
+            created_at: startDate.toISOString(),
+            velocity: 6.5,
+        });
+
+        expect(response).toStrictEqual({});
     });
 });
