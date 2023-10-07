@@ -52,6 +52,10 @@ export interface IHereClient {
     discoverLocation: (input: DiscoverLocationInput) => Promise<{ items: DiscoverLocationItem[] }>;
 }
 
+export function makeHereClient(baseUrl: string, apiKey: string): IHereClient {
+    return new HereClient(baseUrl, apiKey);
+}
+
 export class HereClient implements IHereClient {
     constructor(
         private readonly baseUrl: string,

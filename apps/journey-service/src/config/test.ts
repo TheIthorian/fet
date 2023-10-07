@@ -16,7 +16,7 @@ export const testConfig = {
     },
 
     hereApi: {
-        discoverSearchUrl: '',
+        discoverSearchUrl: 'https://discover.search.hereapi.com/v1',
         apiKey: process.env.HERE_APP_KEY ?? '',
     },
 } as const;

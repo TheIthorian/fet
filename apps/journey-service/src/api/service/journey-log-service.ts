@@ -4,14 +4,14 @@ import type { CompletedJourney } from '../journey/types';
 import { config } from '../../config';
 import type { LocationService } from './location/types';
 import { HereLocationService } from './location';
-import { HereClient } from './location/here-client';
+import { makeHereClient } from './location/here-client';
 
 const log = makeLogger(module);
 
 export function makeJourneyLogService(): JourneyLogService {
     const journeyLogMsClient = new MicroserviceClient(config.mainApp.url, config.mainApp.apiKey);
 
-    const hereClient = new HereClient(config.hereApi.discoverSearchUrl, config.hereApi.apiKey);
+    const hereClient = makeHereClient(config.hereApi.discoverSearchUrl, config.hereApi.apiKey);
     const hereLocationService = new HereLocationService(hereClient);
 
     return new JourneyLogService(journeyLogMsClient, hereLocationService);
