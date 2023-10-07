@@ -36,10 +36,10 @@
         "express-promise-router": "^4.1.1",
         "express-status-monitor": "^1.3.4",
         "fet-errors": "*",
-        "fet-object-schema": "*",
+        "fet-http": "*",
         "fet-journey-service-client": "*",
         "fet-logger": "*",
-        "fet-http": "*",
+        "fet-object-schema": "*",
         "tsconfig": "*",
         "ulid": "^2.3.0",
         "zod": "^3.22.2"
