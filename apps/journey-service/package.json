@@ -4,8 +4,8 @@
     "main": "app.ts",
     "scripts": {
         "build": "tsc",
-        "start": "node src/app.ts | pino-pretty",
-        "dev": "src/app.ts | pino-pretty",
+        "start": "ts-node src/app.ts | pino-pretty",
+        "dev": "nodemon src/app.ts | pino-pretty",
         "test": "jest --detectOpenHandles --forceExit",
         "test:cov": "jest --coverage",
         "format": "prettier --write .",
