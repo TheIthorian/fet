@@ -1,7 +1,7 @@
 import { MicroserviceClient } from 'fet-http';
 import { logContext, makeLogger } from 'fet-logger';
 import type { CompletedJourney } from '../journey/types';
-import config from '../../config';
+import { config } from '../../config';
 import type { LocationService } from './location/types';
 import { HERELocationService } from './location';
 import { HereClient } from './location/here-client';

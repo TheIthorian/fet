@@ -1,9 +1,8 @@
 {
     "$schema": "https://turbo.build/schema.json",
-    "globalDependencies": [
-        "**/.env.*local"
-    ],
+    "globalDependencies": ["**/.env.*local"],
     "globalEnv": [
+        "NODE_ENV",
         "JOURNEY_SERVICE_DATABASE_URL",
         "JOURNEY_SERVICE_HOST",
         "JOURNEY_SERVICE_PORT",
@@ -20,13 +19,8 @@
     ],
     "pipeline": {
         "build": {
-            "dependsOn": [
-                "^build"
-            ],
-            "outputs": [
-                ".next/**",
-                "!.next/cache/**"
-            ]
+            "dependsOn": ["^build"],
+            "outputs": [".next/**", "!.next/cache/**"]
         },
         "lint": {},
         "format": {},
@@ -36,9 +30,7 @@
             "persistent": true
         },
         "start": {
-            "dependsOn": [
-                "^build"
-            ]
+            "dependsOn": ["^build"]
         }
     }
 }

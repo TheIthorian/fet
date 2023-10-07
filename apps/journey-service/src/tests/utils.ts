@@ -3,7 +3,7 @@ import { setTimeout } from 'node:timers/promises';
 import type { Express } from 'express';
 import express from 'express';
 import { startup } from '../express';
-import config from '../config';
+import { config } from '../config';
 
 export interface App {
     express: Express;
