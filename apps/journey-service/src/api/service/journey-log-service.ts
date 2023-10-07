@@ -3,7 +3,7 @@ import { logContext, makeLogger } from 'fet-logger';
 import type { CompletedJourney } from '../journey/types';
 import { config } from '../../config';
 import type { LocationService } from './location/types';
-import { HERELocationService } from './location';
+import { HereLocationService } from './location';
 import { HereClient } from './location/here-client';
 
 const log = makeLogger(module);
@@ -12,7 +12,7 @@ export function makeJourneyLogService(): JourneyLogService {
     const journeyLogMsClient = new MicroserviceClient(config.mainApp.url, config.mainApp.apiKey);
 
     const hereClient = new HereClient(config.hereApi.discoverSearchUrl, config.hereApi.apiKey);
-    const hereLocationService = new HERELocationService(hereClient);
+    const hereLocationService = new HereLocationService(hereClient);
 
     return new JourneyLogService(journeyLogMsClient, hereLocationService);
 }

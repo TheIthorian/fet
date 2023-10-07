@@ -7,11 +7,11 @@ const log = makeLogger(module);
 // https://docs.inrix.com/traffic/fuel/#get-fuelstations
 // https://platform.here.com/portal/
 // https://developer.here.com/documentation/identity-access-management/dev_guide/topics/sdk.html
-export class HERELocationService implements LocationService {
+export class HereLocationService implements LocationService {
     constructor(private readonly hereClient: HereClient) {}
 
     async getLocationDetails({ lat, lon }: GetLocationDetailsInput): Promise<LocationDetails> {
-        logContext(`${HERELocationService.name}.${this.getLocationDetails.name}`, { lat, lon }, log);
+        logContext(`${HereLocationService.name}.${this.getLocationDetails.name}`, { lat, lon }, log);
         const { items } = await this.hereClient.discoverLocation({ lat, lon, q: 'petrol station' });
 
         return {
