@@ -1,3 +1,4 @@
+import { setTimeout } from 'node:timers/promises';
 import { faker } from '@faker-js/faker';
 import { makeClient } from 'fet-journey-service-client';
 import { mockHereClient } from '../../api/service/location/__mocks__/here-client';
@@ -131,6 +132,8 @@ describe('JourneyServiceClient', () => {
                 distance: 27888.060536859804,
                 endTime: reading4Date.toISOString(),
             });
+
+            await setTimeout(100);
 
             expect(mockHereClient.discoverLocation).toHaveBeenCalledTimes(1);
             expect(mockHereClient.discoverLocation).toHaveBeenCalledWith({
