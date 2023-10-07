@@ -3,7 +3,7 @@
 // import { validateObjectIsNotNull } from '../utils/config-validation';
 import 'dotenv/config'; // Load .env file
 
-import { testConfig } from './test';
+import { testConfig } from './tst';
 import { prodConfig } from './prod';
 import { devConfig } from './dev';
 

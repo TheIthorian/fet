@@ -4,10 +4,10 @@
     "main": "app.ts",
     "scripts": {
         "build": "tsc",
-        "start": "NODE_ENV=prod -node src/app.ts | pino-pretty",
-        "dev": "NODE_ENV=dev src/app.ts | pino-pretty",
-        "test": "NODE_ENV=test jest --detectOpenHandles --forceExit",
-        "test:cov": "NODE_ENV=test jest --coverage",
+        "start": "node src/app.ts | pino-pretty",
+        "dev": "src/app.ts | pino-pretty",
+        "test": "jest --detectOpenHandles --forceExit",
+        "test:cov": "jest --coverage",
         "format": "prettier --write .",
         "lint": "eslint . --ext=.ts",
         "ci": "npm run format && npm run lint && npm run build && npm run test"
