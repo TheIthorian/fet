@@ -21,7 +21,7 @@ function validatePropertyIsNotNull(key: string, value: unknown): void {
 type ConfigType = string | number | Record<string, unknown> | boolean;
 
 function isConfigType(obj: unknown): obj is ConfigType {
-    if (obj === undefined || obj === null) {
+    if (obj === undefined || obj === null || obj === '') {
         return false;
     }
 

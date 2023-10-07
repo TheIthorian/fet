@@ -14,13 +14,13 @@ const config = {
     isTest: process.env.JOURNEY_SERVICE_NODE_ENV === 'test',
 
     mainApp: {
-        url: process.env.MAIN_APP_URL,
-        apiKey: process.env.MAIN_APP_INTERNAL_KEY,
+        url: process.env.MAIN_APP_URL ?? '',
+        apiKey: process.env.MAIN_APP_INTERNAL_KEY ?? '',
     },
 
     hereApi: {
         discoverSearchUrl: 'https://discover.search.hereapi.com/v1',
-        apiKey: process.env.HERE_APP_KEY,
+        apiKey: process.env.HERE_APP_KEY ?? '',
     },
 };
 

@@ -9,9 +9,9 @@ import { HereClient } from './location/here-client';
 const log = makeLogger(module);
 
 export function makeJourneyLogService(): JourneyLogService {
-    const journeyLogMsClient = new MicroserviceClient(config.mainApp.url!, config.mainApp.apiKey!);
+    const journeyLogMsClient = new MicroserviceClient(config.mainApp.url, config.mainApp.apiKey);
 
-    const hereClient = new HereClient(config.hereApi.discoverSearchUrl, config.hereApi.apiKey!);
+    const hereClient = new HereClient(config.hereApi.discoverSearchUrl, config.hereApi.apiKey);
     const hereLocationService = new HERELocationService(hereClient);
 
     return new JourneyLogService(journeyLogMsClient, hereLocationService);
