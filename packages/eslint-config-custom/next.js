@@ -40,6 +40,9 @@ module.exports = {
         'import/no-default-export': 'off',
         'prettier/prettier': ['error'],
         'camelcase': 'off',
+        '@typescript-eslint/naming-convention': 'off',
+        '@typescript-eslint/no-unused-vars': 'error',
+        'no-unused-vars': 'off',
     },
     plugins: ['prettier', 'jest'],
     env: {
