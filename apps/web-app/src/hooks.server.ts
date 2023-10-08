@@ -9,7 +9,6 @@ export async function handle({ event, resolve }) {
     }
 
     const token = event.cookies.get('token');
-    console.log({ token });
 
     if (!token) {
         console.log('no token. redirecting');
@@ -18,8 +17,7 @@ export async function handle({ event, resolve }) {
     }
 
     const userDetails = await getUserDetails({ token }).catch((error) => {
-        console.error(error);
-        console.log('invalid token. redirecting');
+        console.log(`invalid token. redirecting ${error.statusText}`);
         event.cookies.delete('token');
         throw redirect(303, '/login');
     });
