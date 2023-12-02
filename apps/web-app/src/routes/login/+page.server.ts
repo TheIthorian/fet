@@ -29,7 +29,6 @@ export const actions = {
 };
 
 async function login({ email, password }: { email: string; password: string }) {
-    console.log({ email, password });
     const response = await request('http://127.0.0.1:3333/login', {
         method: 'POST',
         body: JSON.stringify({ email, password }),
