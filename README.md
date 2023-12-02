@@ -38,18 +38,28 @@ npm i
 
 ### Build
 
-To build all apps and packages, run the following command:
+To build all apps and packages (including sqlite database) run the following command:
 
 ```
 npm run build
 ```
+
+Create the database with
+
+```sh
+node apps/main/ace migration:run
+```
+
+See https://docs.adonisjs.com/guides/ace-commandline for more ace commands
 
 ### Develop
 
 To develop all apps and packages, run the following command:
 
 ```
+
 npm run dev
+
 ```
 
 #### Check it's working
