@@ -2,14 +2,6 @@
 
 This is a project to help track fuel efficiency for cars. It is built off the [node-turborepo-starter](https://github.com/TheIthorian/node-monorepo-starter) template.
 
-## Installing
-
-Run the following command:
-
-```sh
-npm i
-```
-
 ## What's inside?
 
 This Turborepo includes the following packages/apps:
@@ -36,12 +28,20 @@ HERE_APP_ID= # Generated when creating an app
 HERE_APP_KEY= # Generated when creating an api key under the app
 ```
 
+## Installing
+
+Run the following command:
+
+```sh
+npm i
+```
+
 ### Build
 
 To build all apps and packages, run the following command:
 
 ```
-npm build
+npm run build
 ```
 
 ### Develop
@@ -49,5 +49,15 @@ npm build
 To develop all apps and packages, run the following command:
 
 ```
-npm dev
+npm run dev
+```
+
+#### Check it's working
+
+```sh
+echo '\n\nmain'
+curl localhost:3333/api/health
+
+echo '\n\njourney service'
+curl localhost:3010/api/health
 ```
