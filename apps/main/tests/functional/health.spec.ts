@@ -1,6 +1,6 @@
 import { test } from '@japa/runner';
 
-test('display welcome page', async ({ client }) => {
+test('gets api health', async ({ client }) => {
     const response = await client.get('/api/health');
 
     response.assertStatus(200);
