@@ -1,5 +1,7 @@
 # Template Service
 
+Example service used to create new services from
+
 ## Getting Started
 
 Run the development server:

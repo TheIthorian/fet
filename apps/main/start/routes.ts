@@ -20,8 +20,8 @@
 
 import Route from '@ioc:Adonis/Core/Route';
 
-Route.get('/', async () => {
-    return { hello: 'world' };
+Route.get('/api/health', async () => {
+    return 'ok';
 });
 
 Route.post('register', 'AuthController.register');

@@ -52,3 +52,40 @@ Then start the production server with:
 ```bash
 npm start
 ```
+
+## Api Endpoints
+
+| Method              | Endpoint                              | Description                                                             |
+| ------------------- | ------------------------------------- | ----------------------------------------------------------------------- |
+| GET                 | api/health                            | Check health of service                                                 |
+| POST                | register                              | User registration                                                       |
+| POST                | login                                 | User login                                                              |
+| POST                | logout                                | User logout (auth required)                                             |
+| GET                 | api/me                                | Get user profile                                                        |
+|                     |                                       |                                                                         |
+| **Integrations**    |                                       |                                                                         |
+| GET                 | api/me/integrations                   | Get user integrations                                                   |
+| POST                | api/me/integrations/:integration_name | Create user integration                                                 |
+| POST                | api/location/:integrationName         | Handle location update. Starts or stops a journey if conditions are met |
+|                     |                                       |                                                                         |
+| **User config**     |                                       |                                                                         |
+|                     |                                       |                                                                         |
+| POST                | api/me/config                         | Create user config                                                      |
+| GET                 | api/me/config                         | Get user configs                                                        |
+| PUT                 | api/me/config/:id                     | Update user config                                                      |
+| DELETE              | api/me/config/:id                     | Delete user config                                                      |
+|                     |                                       |                                                                         |
+| **Vehicles**        |                                       |                                                                         |
+| POST                | api/vehicles                          | Create vehicle                                                          |
+| GET                 | api/vehicles                          | Get vehicles                                                            |
+| PUT                 | api/vehicles/:id                      | Update vehicle                                                          |
+| DELETE              | api/vehicles/:id                      | Delete vehicle                                                          |
+|                     |                                       |                                                                         |
+| **Odometer**        |                                       |                                                                         |
+| POST                | api/vehicles/:vehicleId/odometer      | Create odometer reading                                                 |
+| GET                 | api/vehicles/:vehicleId/odometer      | Get odometer readings                                                   |
+| PUT                 | api/vehicles/:vehicleId/odometer/:id  | Update odometer reading                                                 |
+| DELETE              | api/vehicles/:vehicleId/odometer/:id  | Delete odometer reading                                                 |
+|                     |                                       |                                                                         |
+| **Journey Service** |                                       |                                                                         |
+| POST                | /iapi/journey                         | Create internal journey                                                 |
