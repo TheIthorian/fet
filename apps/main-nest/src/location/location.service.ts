@@ -24,7 +24,10 @@ export class LocationService {
     ) {}
 
     async handleUpdate(integrationName: string, apiKey: string, body: Record<string, unknown>) {
-        const integration = await this.integrationsService.findByApiKeyAndIntegration(apiKey, integrationName);
+        const integration = await this.integrationsService.findByApiKeyAndIntegration(
+            apiKey,
+            integrationName,
+        );
         if (!integration) throw new UnauthorizedException('Invalid API key');
 
         const location = this.transformBody(integration.userId.toString(), body);
@@ -32,9 +35,13 @@ export class LocationService {
         const journeyServiceUrl = this.config.getOrThrow<string>('JOURNEY_SERVICE_URL');
 
         const { data } = await firstValueFrom(
-            this.httpService.post(`${journeyServiceUrl}/api/users/${location.userId}/location`, location, {
-                headers: { 'x-api-key': this.config.getOrThrow('INTERNAL_KEY') },
-            }),
+            this.httpService.post(
+                `${journeyServiceUrl}/api/users/${location.userId}/location`,
+                location,
+                {
+                    headers: { 'x-api-key': this.config.getOrThrow('INTERNAL_KEY') },
+                },
+            ),
         ).catch((err) => {
             this.logger.error('Failed to post location to journey-service', err?.message);
             throw err;
@@ -57,8 +64,14 @@ export class LocationService {
             lat,
             lon,
             created_at,
-            velocity: body['velocity'] !== null && body['velocity'] !== undefined ? Number(body['velocity']) : undefined,
-            distance: body['distance'] !== null && body['distance'] !== undefined ? Number(body['distance']) : undefined,
+            velocity:
+                body['velocity'] !== null && body['velocity'] !== undefined
+                    ? Number(body['velocity'])
+                    : undefined,
+            distance:
+                body['distance'] !== null && body['distance'] !== undefined
+                    ? Number(body['distance'])
+                    : undefined,
         };
     }
 }

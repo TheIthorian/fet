@@ -6,10 +6,14 @@ import type { CreateOdometerReadingDto } from './dto/create-odometer-reading.dto
 
 @Injectable()
 export class OdometerService {
-    constructor(@InjectModel(OdometerReading.name) private readonly model: Model<OdometerReading>) {}
+    constructor(
+        @InjectModel(OdometerReading.name) private readonly model: Model<OdometerReading>,
+    ) {}
 
     findAll(vehicleId: string) {
-        return this.model.find({ vehicleId: new Types.ObjectId(vehicleId) }).sort({ readingDate: -1 });
+        return this.model
+            .find({ vehicleId: new Types.ObjectId(vehicleId) })
+            .sort({ readingDate: -1 });
     }
 
     create(userId: string, vehicleId: string, dto: CreateOdometerReadingDto) {

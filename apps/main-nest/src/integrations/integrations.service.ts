@@ -27,7 +27,11 @@ export class IntegrationsService {
     }
 
     async generateApiKey(userId: string, integrationName: string) {
-        if (!SUPPORTED_INTEGRATIONS.includes(integrationName as (typeof SUPPORTED_INTEGRATIONS)[number])) {
+        if (
+            !SUPPORTED_INTEGRATIONS.includes(
+                integrationName as (typeof SUPPORTED_INTEGRATIONS)[number],
+            )
+        ) {
             throw new BadRequestException(`Unknown integration: ${integrationName}`);
         }
 

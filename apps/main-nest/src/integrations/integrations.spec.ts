@@ -6,8 +6,16 @@ import { AppModule } from '../app.module';
 
 async function registerAndLogin(app: NestFastifyApplication): Promise<string> {
     const email = `integrations-${Date.now()}@example.com`;
-    await app.inject({ method: 'POST', url: '/register', payload: { email, password: 'secret1234' } });
-    const res = await app.inject({ method: 'POST', url: '/login', payload: { email, password: 'secret1234' } });
+    await app.inject({
+        method: 'POST',
+        url: '/register',
+        payload: { email, password: 'secret1234' },
+    });
+    const res = await app.inject({
+        method: 'POST',
+        url: '/login',
+        payload: { email, password: 'secret1234' },
+    });
     return res.json<{ token: string }>().token;
 }
 
@@ -18,7 +26,9 @@ describe('Integrations', () => {
     beforeAll(async () => {
         const module = await Test.createTestingModule({ imports: [AppModule] }).compile();
         app = module.createNestApplication<NestFastifyApplication>(new FastifyAdapter());
-        app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true, forbidNonWhitelisted: true }));
+        app.useGlobalPipes(
+            new ValidationPipe({ whitelist: true, transform: true, forbidNonWhitelisted: true }),
+        );
         await app.init();
         await app.getHttpAdapter().getInstance().ready();
         token = await registerAndLogin(app);

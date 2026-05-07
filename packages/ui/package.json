@@ -7,7 +7,7 @@
     "scripts": {
         "lint": "oxlint .",
         "generate:component": "turbo gen react-component",
-        "format": "oxc-formatter ."
+        "format": "oxfmt ."
     },
     "devDependencies": {
         "@turbo/gen": "^1.10.12",

@@ -10,9 +10,10 @@
         "format": "turbo run format",
         "test": "turbo run test",
         "ci": "pnpm run lint && pnpm run build && pnpm run test"
-    },
+    }, 
     "devDependencies": {
         "turbo": "latest",
-        "oxlint": "latest"
+        "oxlint": "latest",  
+        "oxfmt": "latest" 
     }
 }

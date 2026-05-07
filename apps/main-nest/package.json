@@ -9,7 +9,7 @@
         "test": "vitest run",
         "test:watch": "vitest",
         "lint": "oxlint src",
-        "format": "oxc-formatter src"
+        "format": "oxfmt src"
     },
     "dependencies": {
         "@nestjs/axios": "^3.0.0",

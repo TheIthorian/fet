@@ -12,7 +12,9 @@ describe('Auth', () => {
     beforeAll(async () => {
         const module = await Test.createTestingModule({ imports: [AppModule] }).compile();
         app = module.createNestApplication<NestFastifyApplication>(new FastifyAdapter());
-        app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true, forbidNonWhitelisted: true }));
+        app.useGlobalPipes(
+            new ValidationPipe({ whitelist: true, transform: true, forbidNonWhitelisted: true }),
+        );
         await app.init();
         await app.getHttpAdapter().getInstance().ready();
     });
@@ -20,7 +22,11 @@ describe('Auth', () => {
     afterAll(() => app.close());
 
     it('POST /register creates a user and returns a token', async () => {
-        const res = await app.inject({ method: 'POST', url: '/register', payload: { email, password } });
+        const res = await app.inject({
+            method: 'POST',
+            url: '/register',
+            payload: { email, password },
+        });
 
         expect(res.statusCode).toBe(201);
         const body = res.json<{ token: string; user: { email: string } }>();
@@ -29,14 +35,20 @@ describe('Auth', () => {
     });
 
     it('POST /login returns a token for valid credentials', async () => {
-        const res = await app.inject({ method: 'POST', url: '/login', payload: { email, password } });
+        const res = await app.inject({
+            method: 'POST',
+            url: '/login',
+            payload: { email, password },
+        });
 
         expect(res.statusCode).toBe(201);
         expect(res.json<{ token: string }>().token).toBeDefined();
     });
 
     it('GET /api/me returns the authenticated user', async () => {
-        const { token } = (await app.inject({ method: 'POST', url: '/login', payload: { email, password } })).json<{
+        const { token } = (
+            await app.inject({ method: 'POST', url: '/login', payload: { email, password } })
+        ).json<{
             token: string;
         }>();
 

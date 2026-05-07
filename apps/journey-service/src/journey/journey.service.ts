@@ -24,7 +24,7 @@ export class JourneyService {
     constructor(
         @InjectModel(ActiveJourney.name) private readonly model: Model<ActiveJourney>,
         private readonly httpService: HttpService,
-        private readonly config: ConfigService
+        private readonly config: ConfigService,
     ) {}
 
     async handlePostLocation(dto: PostLocationDto) {
@@ -48,16 +48,28 @@ export class JourneyService {
         const timeSinceLastReading = createdAt.getTime() - active.lastReadingDate!.getTime();
         const actualDistance = distance ?? calcDistance(active.lastLocation, { lat, lon });
         const actualVelocity = velocity ?? (1000 * actualDistance) / timeSinceLastReading;
-        const timeSinceSignificant = createdAt.getTime() - active.lastSignificantReadingDate!.getTime();
+        const timeSinceSignificant =
+            createdAt.getTime() - active.lastSignificantReadingDate!.getTime();
 
         if (timeSinceSignificant > MIN_STATIONARY_MS && actualVelocity < MAX_VELOCITY_TO_STOP) {
             return this.completeJourney(active, createdAt);
         }
 
-        return this.updateInProgressJourney(active, actualDistance, actualVelocity, lat, lon, createdAt);
+        return this.updateInProgressJourney(
+            active,
+            actualDistance,
+            actualVelocity,
+            lat,
+            lon,
+            createdAt,
+        );
     }
 
-    private async startJourney(userId: string, startTime: Date, location: Coordinates): Promise<ActiveJourney> {
+    private async startJourney(
+        userId: string,
+        startTime: Date,
+        location: Coordinates,
+    ): Promise<ActiveJourney> {
         const journeyId = ulid();
         const journey = await this.model.create({
             userId,
@@ -77,7 +89,7 @@ export class JourneyService {
         lat: number,
         lon: number,
         distance: number | undefined,
-        createdAt: Date
+        createdAt: Date,
     ) {
         const delta = distance ?? calcDistance(journey.startLocation, { lat, lon });
         return this.model.findOneAndUpdate(
@@ -91,7 +103,7 @@ export class JourneyService {
                     distance: journey.distance + delta,
                 },
             },
-            { new: true }
+            { new: true },
         );
     }
 
@@ -101,7 +113,7 @@ export class JourneyService {
         velocity: number,
         lat: number,
         lon: number,
-        createdAt: Date
+        createdAt: Date,
     ) {
         const isSignificant = velocity >= MAX_VELOCITY_TO_STOP;
         return this.model.findOneAndUpdate(
@@ -110,11 +122,13 @@ export class JourneyService {
                 $set: {
                     lastLocation: { lat, lon },
                     lastReadingDate: createdAt,
-                    lastSignificantReadingDate: isSignificant ? createdAt : journey.lastSignificantReadingDate,
+                    lastSignificantReadingDate: isSignificant
+                        ? createdAt
+                        : journey.lastSignificantReadingDate,
                     distance: journey.distance + distanceToAdd,
                 },
             },
-            { new: true }
+            { new: true },
         );
     }
 
@@ -143,7 +157,7 @@ export class JourneyService {
             await firstValueFrom(
                 this.httpService.post(`${mainUrl}/iapi/journey`, journey, {
                     headers: { 'x-internal-key': key },
-                })
+                }),
             );
         } catch (err) {
             this.logger.error(`Failed to notify main of completed journey ${journey['id']}`, err);

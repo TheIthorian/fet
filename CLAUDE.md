@@ -52,16 +52,16 @@ The `docker-compose.yml` at the repo root defines dev services: `main`, `journey
 
 ## Tech Stack
 
-| Area                      | Choice                                                            |
-| ------------------------- | ----------------------------------------------------------------- |
-| Runtime                   | Node.js 24 LTS                                                    |
-| Package manager           | pnpm                                                              |
-| Monorepo                  | Turborepo                                                         |
-| Backend framework         | NestJS with **Fastify adapter** (`@nestjs/platform-fastify`)      |
-| Database                  | MongoDB via Mongoose (`@nestjs/mongoose`)                         |
-| Frontend                  | Vite + React                                                      |
-| Docs                      | Docusaurus + `docusaurus-plugin-openapi-docs`                     |
-| Lint / Format / Transform | [OXC](https://oxc.rs/) (`oxlint`, oxc formatter, oxc transformer) |
+| Area                      | Choice                                                                |
+| ------------------------- | --------------------------------------------------------------------- |
+| Runtime                   | Node.js 24 LTS                                                        |
+| Package manager           | pnpm                                                                  |
+| Monorepo                  | Turborepo                                                             |
+| Backend framework         | NestJS with **Fastify adapter** (`@nestjs/platform-fastify`)          |
+| Database                  | MongoDB via Mongoose (`@nestjs/mongoose`)                             |
+| Frontend                  | Vite + React                                                          |
+| Docs                      | Docusaurus + `docusaurus-plugin-openapi-docs`                         |
+| Lint / Format / Transform | [OXC](https://oxc.rs/) — `oxlint` for linting, `oxfmt` for formatting |
 
 > **Fastify adapter note:** If passport.js or a third-party middleware requires Express, swap by replacing `FastifyAdapter` with `ExpressAdapter` in `main.ts` — everything else stays the same.
 
@@ -134,6 +134,7 @@ Docusaurus site. Source docs live in `docs/` markdown files. OpenAPI spec is gen
 - **Explicit return types** — every function and method must have an explicit return type annotation. Enforced by ESLint.
 - **Object arguments** — when a function has two or more parameters, use a single object argument instead of positional params.
 - **Docstrings** — add a JSDoc comment to every public method on a class or interface, and every exported module-level function. Keep them concise: only document parameters, return value, or thrown errors when it genuinely adds information beyond the name.
+- **Trailing commas** — always include trailing commas on the last item of multi-line objects, arrays, and parameter lists (`trailingComma: "all"`). Enforced by oxfmt.
 - **Logging** — always place a blank line before and after a log statement, and a blank line after a closing scope brace (where the formatter allows).
 
 ### Testing
