@@ -71,3 +71,16 @@ curl localhost:3333/api/health
 echo '\n\njourney service'
 curl localhost:3010/api/health
 ```
+
+## Run with Docker (web app only)
+
+The root `Dockerfile` builds and runs the `@fet/web` workspace in production on port `3000`.
+
+From the repository root:
+
+```bash
+docker build -t fet-web .
+docker run --rm -p 3000:3000 fet-web
+```
+
+Then open [http://localhost:3000](http://localhost:3000). Other monorepo services (for example the main API on `3333`) are not started by this image; use `npm run dev` for the full stack locally.
