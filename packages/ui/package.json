@@ -5,19 +5,17 @@
     "types": "./index.tsx",
     "license": "MIT",
     "scripts": {
-        "lint": "eslint .",
+        "lint": "oxlint .",
         "generate:component": "turbo gen react-component",
-        "format": "prettier --write ."
+        "format": "oxc-formatter ."
     },
     "devDependencies": {
         "@turbo/gen": "^1.10.12",
         "@types/node": "^20.5.2",
         "@types/react": "^18.2.0",
         "@types/react-dom": "^18.2.0",
-        "eslint-config-custom": "*",
         "react": "^18.2.0",
         "tsconfig": "*",
-        "typescript": "^4.5.2",
-        "prettier-config": "*"
+        "typescript": "^4.5.2"
     }
 }

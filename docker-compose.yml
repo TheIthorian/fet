@@ -1,0 +1,70 @@
+services:
+  mongodb:
+    image: mongo:8
+    restart: unless-stopped
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongodb_data:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: fet
+
+  main:
+    build:
+      context: .
+      dockerfile: apps/main-nest/Dockerfile
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      MONGODB_URI: mongodb://mongodb:27017/fet
+      JWT_SECRET: ${JWT_SECRET:-dev-secret-change-me}
+      INTERNAL_KEY: ${INTERNAL_KEY:-dev-internal-key}
+      JOURNEY_SERVICE_URL: http://journey-service:3010
+      PROXY_URL: http://localhost:3000
+    depends_on:
+      - mongodb
+    develop:
+      watch:
+        - action: sync
+          path: ./apps/main-nest/src
+          target: /app/apps/main-nest/src
+
+  journey-service:
+    build:
+      context: .
+      dockerfile: apps/journey-service/Dockerfile
+    restart: unless-stopped
+    ports:
+      - '3010:3010'
+    environment:
+      NODE_ENV: development
+      PORT: 3010
+      MONGODB_URI: mongodb://mongodb:27017/fet-journey
+      INTERNAL_KEY: ${INTERNAL_KEY:-dev-internal-key}
+      MAIN_APP_URL: http://main:3000
+    depends_on:
+      - mongodb
+    develop:
+      watch:
+        - action: sync
+          path: ./apps/journey-service/src
+          target: /app/apps/journey-service/src
+
+  web:
+    image: node:24-alpine
+    working_dir: /app
+    command: sh -c "corepack enable && pnpm install && pnpm --filter @fet/web dev --host"
+    ports:
+      - '5173:5173'
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      VITE_API_URL: http://localhost:3000
+      PROXY_URL: http://main:3000
+
+volumes:
+  mongodb_data:

@@ -3,10 +3,7 @@
     "version": "1.0.0",
     "main": "index.ts",
     "devDependencies": {
-        "eslint": "^8.47.0",
-        "prettier": "^3.0.2",
-        "tsconfig": "*",
-        "prettier-config": "*"
+        "tsconfig": "*"
     },
     "dependencies": {
         "@types/pino": "^7.0.5",

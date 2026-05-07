@@ -1,29 +1,18 @@
 {
     "private": true,
+    "name": "fet-monorepo",
+    "packageManager": "pnpm@9.0.6",
     "scripts": {
         "build": "turbo run build",
         "dev": "turbo run dev --concurrency=16",
         "start": "turbo run start --concurrency=16",
         "lint": "turbo run lint",
-        "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+        "format": "turbo run format",
         "test": "turbo run test",
-        "ci": "npm run format && npm run lint && npm run build && npm run test"
+        "ci": "pnpm run lint && pnpm run build && pnpm run test"
     },
     "devDependencies": {
-        "eslint": "^8.47.0",
-        "prettier": "^3.0.2",
-        "tsconfig": "*",
-        "turbo": "latest"
-    },
-    "name": "fet-monorepo",
-    "packageManager": "npm@8.5.1",
-    "workspaces": [
-        "apps/*",
-        "packages/*"
-    ],
-    "dependencies": {
-        "cd": "^0.3.3",
-        "dotenv-cli": "^7.3.0",
-        "fet-monorepo": "file:"
+        "turbo": "latest",
+        "oxlint": "latest"
     }
 }

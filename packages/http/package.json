@@ -3,14 +3,11 @@
     "version": "1.0.0",
     "main": "index.ts",
     "devDependencies": {
-        "eslint": "^8.47.0",
-        "prettier": "^3.0.2",
-        "prettier-config": "*",
-        "tsconfig": "*"
+        "tsconfig": "workspace:*"
     },
     "dependencies": {
-        "fet-errors": "*",
-        "fet-logger": "*",
+        "fet-errors": "workspace:*",
+        "fet-logger": "workspace:*",
         "node-fetch-native": "^1.4.0"
     }
 }

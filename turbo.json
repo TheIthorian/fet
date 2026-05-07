@@ -3,24 +3,18 @@
     "globalDependencies": ["**/.env.*local"],
     "globalEnv": [
         "NODE_ENV",
-        "JOURNEY_SERVICE_DATABASE_URL",
-        "JOURNEY_SERVICE_HOST",
-        "JOURNEY_SERVICE_PORT",
-        "JOURNEY_SERVICE_NODE_ENV",
-        "JOURNEY_SERVICE_API_KEY",
-        "LOCATION_SERVICE_DATABASE_URL",
-        "LOCATION_SERVICE_HOST",
-        "LOCATION_SERVICE_PORT",
-        "LOCATION_SERVICE_NODE_ENV",
-        "LOCATION_SERVICE_API_KEY",
+        "PORT",
+        "MONGODB_URI",
+        "JWT_SECRET",
+        "INTERNAL_KEY",
+        "JOURNEY_SERVICE_URL",
         "MAIN_APP_URL",
-        "MAIN_APP_INTERNAL_KEY",
         "HERE_APP_KEY"
     ],
     "pipeline": {
         "build": {
             "dependsOn": ["^build"],
-            "outputs": [".next/**", "!.next/cache/**"]
+            "outputs": ["dist/**"]
         },
         "lint": {},
         "format": {},
